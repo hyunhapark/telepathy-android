@@ -8,6 +8,10 @@
 package edu.skku.sosil3.sky.telepathy;
 
 public final class R {
+    public static final class array {
+        public static final int text_size_entries=0x7f050000;
+        public static final int text_size_values=0x7f050001;
+    }
     public static final class attr {
     }
     public static final class dimen {
@@ -18,25 +22,69 @@ public final class R {
          would include 7" and 10" devices in landscape (~960dp and ~1280dp respectively).
     
          */
-        public static final int activity_horizontal_margin=0x7f040000;
-        public static final int activity_vertical_margin=0x7f040001;
+        public static final int activity_horizontal_margin=0x7f060000;
+        public static final int activity_vertical_margin=0x7f060001;
     }
     public static final class drawable {
         public static final int ic_launcher=0x7f020000;
     }
     public static final class id {
-        public static final int action_settings=0x7f080000;
+        public static final int action_settings=0x7f0a0015;
+        public static final int main_id=0x7f0a0001;
+        public static final int main_layout1=0x7f0a0000;
+        public static final int main_layout2=0x7f0a0002;
+        public static final int main_pw=0x7f0a0003;
+        public static final int one_list=0x7f0a0013;
+        public static final int post_content=0x7f0a0012;
+        public static final int post_image=0x7f0a0011;
+        public static final int post_user=0x7f0a0010;
+        public static final int register_id=0x7f0a0005;
+        public static final int register_layout1=0x7f0a0004;
+        public static final int register_layout2=0x7f0a0006;
+        public static final int register_layout3=0x7f0a0008;
+        public static final int register_layout4=0x7f0a000a;
+        public static final int register_nickname=0x7f0a000b;
+        public static final int register_pw=0x7f0a0007;
+        public static final int register_repw=0x7f0a0009;
+        public static final int tab_fragment1=0x7f0a000d;
+        public static final int tab_fragment2=0x7f0a000e;
+        public static final int tab_fragment3=0x7f0a000f;
+        public static final int tabhost=0x7f0a000c;
+        public static final int two_list=0x7f0a0014;
     }
     public static final class layout {
         public static final int activity_main=0x7f030000;
+        public static final int activity_register=0x7f030001;
+        public static final int activity_tab=0x7f030002;
+        public static final int custom=0x7f030003;
+        public static final int fragment_one=0x7f030004;
+        public static final int fragment_two=0x7f030005;
     }
     public static final class menu {
-        public static final int main=0x7f070000;
+        public static final int main=0x7f090000;
+        public static final int register=0x7f090001;
+        public static final int tab=0x7f090002;
     }
     public static final class string {
-        public static final int action_settings=0x7f050002;
-        public static final int app_name=0x7f050000;
-        public static final int hello_world=0x7f050001;
+        public static final int action_settings=0x7f070002;
+        public static final int action_sign_in=0x7f07000b;
+        public static final int action_sign_in_short=0x7f07000c;
+        public static final int app_name=0x7f070000;
+        public static final int error_field_required=0x7f070010;
+        public static final int error_incorrect_password=0x7f07000f;
+        public static final int error_invalid_email=0x7f07000d;
+        public static final int error_invalid_password=0x7f07000e;
+        public static final int hello_world=0x7f070001;
+        /**  Strings related to login 
+         */
+        public static final int prompt_email=0x7f070009;
+        public static final int prompt_password=0x7f07000a;
+        public static final int title_activity_login=0x7f070008;
+        public static final int title_activity_register=0x7f070003;
+        public static final int title_activity_tab=0x7f070004;
+        public static final int title_section1=0x7f070005;
+        public static final int title_section2=0x7f070006;
+        public static final int title_section3=0x7f070007;
     }
     public static final class style {
         /** 
@@ -60,10 +108,13 @@ public final class R {
     
  API 14 theme customizations can go here. 
          */
-        public static final int AppBaseTheme=0x7f060000;
+        public static final int AppBaseTheme=0x7f080000;
         /**  Application theme. 
  All customizations that are NOT specific to a particular API-level can go here. 
          */
-        public static final int AppTheme=0x7f060001;
+        public static final int AppTheme=0x7f080001;
+    }
+    public static final class xml {
+        public static final int preferences=0x7f040000;
     }
 }
