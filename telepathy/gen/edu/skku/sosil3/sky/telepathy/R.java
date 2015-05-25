@@ -29,15 +29,20 @@ public final class R {
         public static final int ic_launcher=0x7f020000;
     }
     public static final class id {
-        public static final int action_settings=0x7f0a0015;
+        public static final int action_settings=0x7f0a001a;
+        public static final int comment_content=0x7f0a0011;
+        public static final int comment_date=0x7f0a0012;
+        public static final int comment_user=0x7f0a0010;
         public static final int main_id=0x7f0a0001;
         public static final int main_layout1=0x7f0a0000;
         public static final int main_layout2=0x7f0a0002;
         public static final int main_pw=0x7f0a0003;
         public static final int one_list=0x7f0a0013;
-        public static final int post_content=0x7f0a0012;
-        public static final int post_image=0x7f0a0011;
-        public static final int post_user=0x7f0a0010;
+        public static final int post_comments=0x7f0a0019;
+        public static final int post_content=0x7f0a0018;
+        public static final int post_date=0x7f0a0016;
+        public static final int post_image=0x7f0a0017;
+        public static final int post_user=0x7f0a0015;
         public static final int register_id=0x7f0a0005;
         public static final int register_layout1=0x7f0a0004;
         public static final int register_layout2=0x7f0a0006;
@@ -56,9 +61,10 @@ public final class R {
         public static final int activity_main=0x7f030000;
         public static final int activity_register=0x7f030001;
         public static final int activity_tab=0x7f030002;
-        public static final int custom=0x7f030003;
+        public static final int comment=0x7f030003;
         public static final int fragment_one=0x7f030004;
         public static final int fragment_two=0x7f030005;
+        public static final int post=0x7f030006;
     }
     public static final class menu {
         public static final int main=0x7f090000;

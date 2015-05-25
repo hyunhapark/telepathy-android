@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 
 public class PostAdapter extends BaseAdapter {
@@ -39,17 +40,25 @@ public class PostAdapter extends BaseAdapter {
 			convertView = inflater.inflate(layoutRes, parent, false);
 		}
 		
-		/*
+		
+		TextView user = (TextView) convertView.findViewById(R.id.post_user);
+		user.setText(list.get(position).getPostUser());
+
+		TextView date = (TextView) convertView.findViewById(R.id.post_date);
+		date.setText(list.get(position).getPostDate());
+		
 		ImageView image = (ImageView) convertView.findViewById(R.id.post_image);
-		image.setImageResource(list.get(position).MyImage);
+		image.setImageResource(R.drawable.ic_launcher); // 수정 요망 list.get(position).getPostImage()
 		
-		TextView title = (TextView) convertView.findViewById(R.id.myitemtitle);
-		title.setText(list.get(position).MyTitle);
+		TextView content = (TextView) convertView.findViewById(R.id.post_content);
+		content.setText(list.get(position).getPostContent());
 		
-		TextView date = (TextView) convertView.findViewById(R.id.myitemdate);
-		date.setText(list.get(position).MyDate);
+		if(list.get(position).getPostComments() != null){
+			ListView comments = (ListView) convertView.findViewById(R.id.post_comments);
+			CommentAdapter adapter = new CommentAdapter(context, R.layout.comment, list.get(position).getPostComments());
+			comments.setAdapter(adapter);
+		}
 		
-		*/
 		return convertView;
 	}
 }
