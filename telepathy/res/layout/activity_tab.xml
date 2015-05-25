@@ -1,0 +1,43 @@
+<TabHost xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/tabhost"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="edu.skku.sosil3.sky.telepathy.TabActivity" >
+
+    <FrameLayout
+        android:background="#FFFFFF"
+        android:id="@android:id/tabcontent"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:paddingBottom="64dp" >
+
+        <fragment
+            android:id="@+id/tab_fragment1"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            class="edu.skku.sosil3.sky.telepathy.FragmentOne" />
+
+        <fragment
+            android:id="@+id/tab_fragment2"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            class="edu.skku.sosil3.sky.telepathy.FragmentTwo" />
+
+        <fragment
+            android:id="@+id/tab_fragment3"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            class="edu.skku.sosil3.sky.telepathy.FragmentThree" />
+        
+    </FrameLayout>
+
+    <TabWidget
+        android:id="@android:id/tabs"
+        android:background="#E1E1E1"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:tabStripEnabled="false" />
+
+</TabHost>
