@@ -1,14 +1,14 @@
 package edu.skku.sosil3.sky.telepathy;
 
+import android.app.Fragment;
 import android.os.Bundle;
-import android.preference.PreferenceFragment;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 
-public class FragmentThree extends PreferenceFragment {
+public class FragmentThree extends Fragment {
 
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		// TODO Auto-generated method stub
-		super.onCreate(savedInstanceState);
-		addPreferencesFromResource(R.xml.preferences);
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
+		return inflater.inflate(R.layout.fragment_three, container, false);
 	}
 }

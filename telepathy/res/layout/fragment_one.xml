@@ -1,11 +1,64 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent" >
-    
-    <ListView
-        android:id="@+id/one_list"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical"
+    android:padding="10dp" >
 
-</RelativeLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:orientation="horizontal">
+        
+    <CheckBox 
+        android:id="@+id/one_anonymity"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+        
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="30dp"
+        android:gravity="center"
+        android:text="익명" />
+    
+    <TextView
+        android:id="@+id/one_date"
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:gravity="center|right"
+        android:text="2015/05/25"
+        android:textSize="10sp"
+        android:textColor="#747474" />
+    
+    </LinearLayout>
+    
+    <ImageView
+        android:id="@+id/one_image"
+        android:src="@drawable/pushtopic"
+        android:scaleType="centerInside"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:onClick="onImage" />
+    
+    <EditText
+        android:id="@+id/one_content"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_gravity="center_vertical"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"
+        android:gravity="top"
+        android:background="#FFFFFF"
+        android:hint="글 내용을 적어주세요"
+        android:textSize="16sp" />
+    
+    <Button
+        android:id="@+id/one_finish"
+        android:layout_width="40dp"
+        android:layout_height="30dp"
+        android:background="@drawable/check"
+        android:layout_gravity="right"
+        android:onClick="onFinish" />
+	
+</LinearLayout>
