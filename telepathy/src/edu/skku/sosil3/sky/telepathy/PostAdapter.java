@@ -1,6 +1,10 @@
 package edu.skku.sosil3.sky.telepathy;
 
 import java.util.ArrayList;
+
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.ImageLoader;
+
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,12 +19,16 @@ public class PostAdapter extends BaseAdapter {
 	int layoutRes;
 	ArrayList<PostItem> list;
 	LayoutInflater inflater;
+	ImageLoader imageLoader;
+	DisplayImageOptions options;
 
 	public PostAdapter(Context context, int layoutRes, ArrayList<PostItem> list) {
 		this.context = context;
 		this.layoutRes = layoutRes;
 		this.list = list;
 		inflater = LayoutInflater.from(context);
+		imageLoader = ImageLoader.getInstance();
+		options = new DisplayImageOptions.Builder().showImageOnLoading(R.drawable.ic_launcher).showImageForEmptyUri(R.drawable.ic_launcher).showImageOnFail(R.drawable.ic_launcher).resetViewBeforeLoading(true).cacheInMemory(true).cacheOnDisk(true).considerExifParams(true).build();
 	}
 
 	public int getCount() {
@@ -47,7 +55,10 @@ public class PostAdapter extends BaseAdapter {
 		date.setText(list.get(position).getPostDate());
 		
 		ImageView image = (ImageView) convertView.findViewById(R.id.post_image);
-		image.setImageResource(R.drawable.ic_launcher); // 수정 요망 list.get(position).getPostImage()
+		String imageUrl = list.get(position).getPostImage();
+		if(!imageUrl.isEmpty()){
+			imageLoader.displayImage(imageUrl, image, options);
+		}
 		
 		TextView content = (TextView) convertView.findViewById(R.id.post_content);
 		content.setText(list.get(position).getPostContent());

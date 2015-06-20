@@ -63,8 +63,8 @@ public class TabActivity extends Activity {
 		
 		// 서버 연결, 데이터 수집
 		ArrayList<PostItem> array1 = new ArrayList<PostItem>();
-		array1.add(new PostItem(1, "조은현", "2015/04/25", "NULL", "ㅎㅎㅎ1", null, 100.0, 100.0));
-		array1.add(new PostItem(1, "조은현", "2015/04/25", "NULL", "ㅎㅎㅎ2", null, 100.0, 100.0));
+		array1.add(new PostItem(1, "조은현", "2015/04/25", "http://sw.skku.ac.kr/image/student/wats/popup/project_sum.jpg", "ㅎㅎㅎ1", null, 100.0, 100.0));
+		array1.add(new PostItem(1, "조은현", "2015/04/25", "", "ㅎㅎㅎ2", null, 100.0, 100.0));
 		
 		ArrayList<PostItem> array2 = new ArrayList<PostItem>();
 		ArrayList<CommentItem> commentarray1 = new ArrayList<CommentItem>();
@@ -72,8 +72,8 @@ public class TabActivity extends Activity {
 		commentarray1.add(new CommentItem("익명", "2015/04/26", "도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배"));
 		commentarray2.add(new CommentItem("김승현", "2015/04/26", "ㅡㅡ?"));
 		commentarray2.add(new CommentItem("박현하", "2015/04/26", "ㅇㅅㅇ;;"));
-		array2.add(new PostItem(1, "조은현", "2015/04/25", "NULL", "도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배", commentarray1, 100.0, 100.0));
-		array2.add(new PostItem(1, "조은현", "2015/04/25", "NULL", "ㅎㅎㅎ2", commentarray2, 100.0, 100.0));
+		array2.add(new PostItem(1, "조은현", "2015/04/25", "", "도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배", commentarray1, 100.0, 100.0));
+		array2.add(new PostItem(1, "조은현", "2015/04/25", "http://sw.skku.ac.kr/image/student/wats/popup/project_sum.jpg", "ㅎㅎㅎ2", commentarray2, 100.0, 100.0));
 		// 데이터 수집 끝
 		
 		PostAdapter adapter1 = new PostAdapter(this, R.layout.post, array1);

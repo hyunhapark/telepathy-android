@@ -25,7 +25,9 @@
     <EditText
         android:id="@+id/register_id"
         android:layout_width="130dp"
-        android:layout_height="50dp" />
+        android:layout_height="50dp"
+        android:inputType="text"
+        android:digits="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890" />
     
     </LinearLayout>
     
