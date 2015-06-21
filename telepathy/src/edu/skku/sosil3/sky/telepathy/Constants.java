@@ -9,10 +9,11 @@ public class Constants {
 	public static final String URI_POST_SIGNUP = "/signup";
 	public static final String URI_POST_SIGNIN = "/signin";
 	public static final String URI_POST_POST = "/post";
-	public static final String URI_POST_POSTIMAGE = "/postimage";
+	public static final String URI_POST_POSTIMAGE = ":8000/postimage";
 	public static final String URI_POST_COMMENT = "/comment";
 	public static final String URI_GET_NEWSFEED = "/newsfeed";
 	public static final String URI_GET_MYPOSTS = "/myposts";
+	public static final String URI_GET_POSTIMAGE = "/images/";
 	public static final int DEFAULT_PAGE_SIZE = 15;
 	
 	/* Update Checking. */

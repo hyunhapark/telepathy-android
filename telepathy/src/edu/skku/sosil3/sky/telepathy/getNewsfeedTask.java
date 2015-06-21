@@ -94,7 +94,7 @@ public class GetNewsfeedTask extends AsyncTask<Void, Void, Void>
 				int ccnt = jcmts.getInt("cnt");
 				JSONArray cmts = jcmts.getJSONArray("arr");
 				for (int j=0;j<ccnt;j++){
-					JSONObject jcmt = cmts.getJSONObject(i);
+					JSONObject jcmt = cmts.getJSONObject(j);
 					CommentItem ci = new CommentItem(jcmt.getString("c_user"),
 							jcmt.getString("c_date"), jcmt.getString("c_content")); 
 					cmt.add(ci);

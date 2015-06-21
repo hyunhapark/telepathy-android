@@ -15,16 +15,11 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.nostra13.universalimageloader.core.DisplayImageOptions;
-import com.nostra13.universalimageloader.core.ImageLoader;
-
 import android.content.Context;
-import android.content.Intent;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Adapter;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -32,8 +27,11 @@ import android.widget.EditText;
 import android.widget.ExpandableListView;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.ImageLoader;
+
+@SuppressWarnings("deprecation")
 public class PostAdapter extends BaseAdapter {
    Context context;
    int layoutRes;
@@ -148,14 +146,14 @@ public class PostAdapter extends BaseAdapter {
          @Override
          public void onClick(View v) {
             
-            final String p_id = ((PostItem) getItem(fposition)).getPostId(); // ???
+            final String p_id = ((PostItem) getItem(fposition)).getPostId();
             
             Boolean c_anonymity = anonymity.isChecked();
             final String c_user;
             if(c_anonymity) { // 익명 여부 판단
-                  c_user = "anonymous";
+            	  c_user = "익명";
                } else {
-                  c_user = TabActivity.id; // ???
+                  c_user = TabActivity.id;
                }
             
             final String c_content = newcomment.getText().toString();
@@ -164,7 +162,6 @@ public class PostAdapter extends BaseAdapter {
             // 댓글을 서버에 전송
             new Thread() {
                   
-                  @SuppressWarnings("deprecation")
                   public void run() {
                      upload_state = DEFAULT;
 
@@ -211,6 +208,7 @@ public class PostAdapter extends BaseAdapter {
    
                      if (upload_state == SUCCESS) { // 업로드 성공
                         Log.d("Upload", "comment : SUCCESS");
+            			((TabActivity)context).refresh_all();
                      } else if (upload_state == NETWORK_ERROR) { // 업로드 실패 - 네트워크 오류
                         Log.d("Upload", "comment : NETWORK_ERROR");
                      } else { // 업로드 실패 - 알 수 없는 오류

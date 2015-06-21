@@ -83,7 +83,7 @@ public class TabActivity extends Activity {
 	private final static int ACT_GALLERY = 2;
 	private final static int SETTINGS_INFO = 3;
 	
-	static int upload_state = 0;
+	public static int upload_state = 0;
 	static final int DEFAULT = 0;
 	static final int SUCCESS = 1;
 	static final int LOCATION_NOT_FOUND = 2;
@@ -182,12 +182,21 @@ public class TabActivity extends Activity {
 	}
 
 	private void get_newsfeed() {
-		String url = Constants.URL_SERVER_HOST+Constants.URI_GET_NEWSFEED+"/anonymous/"+p_lati+"/"+p_long+"/"+Constants.DEFAULT_PAGE_SIZE+"/"+nf_page++;
+		String url = Constants.URL_SERVER_HOST+Constants.URI_GET_NEWSFEED+"/"+id+"/"+p_lati+"/"+p_long+"/"+Constants.DEFAULT_PAGE_SIZE+"/"+nf_page++;
 		new GetNewsfeedTask(this, url).execute();
 	}
 	
 	private void get_my_posts() {
 		String url = Constants.URL_SERVER_HOST+Constants.URI_GET_MYPOSTS+"/"+id+"/"+p_lati+"/"+p_long+"/"+Constants.DEFAULT_PAGE_SIZE+"/"+mp_page++;
+		new GetMypostsTask(this, url).execute();
+	}
+	
+	public void refresh_all() {
+		array1.clear();
+		array2.clear();
+		String url = Constants.URL_SERVER_HOST+Constants.URI_GET_NEWSFEED+"/"+id+"/"+p_lati+"/"+p_long+"/"+Constants.DEFAULT_PAGE_SIZE*nf_page+"/0";
+		new GetNewsfeedTask(this, url).execute();
+		url = Constants.URL_SERVER_HOST+Constants.URI_GET_MYPOSTS+"/"+id+"/"+p_lati+"/"+p_long+"/"+Constants.DEFAULT_PAGE_SIZE*mp_page+"/0";
 		new GetMypostsTask(this, url).execute();
 	}
 
@@ -221,6 +230,7 @@ public class TabActivity extends Activity {
 		}
 		else if(id == R.id.action_refresh){
 			// 새로고침
+			refresh_all();
 		}
 		else if(id == R.id.action_logout){
 			SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
@@ -232,7 +242,7 @@ public class TabActivity extends Activity {
 		}
 		return super.onOptionsItemSelected(item);
 	}
-	
+
 	public void onImage(View v){
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		View customLayout = View.inflate(this, R.layout.uploadimage, null);
@@ -259,7 +269,6 @@ public class TabActivity extends Activity {
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		// TODO Auto-generated method stub
 		super.onActivityResult(requestCode, resultCode, data);
 		
 		if(requestCode == SETTINGS_INFO){
@@ -336,9 +345,9 @@ public class TabActivity extends Activity {
 			res_user = id;
 		}
 	      
-	    if(bmp != null && image_path!=null && !"".equals(image_path) && 1==2){
-	    	String uuid = UUID.randomUUID().toString();
-			new ImageUploadTask(this, image_path, Constants.URL_SERVER_HOST+Constants.URI_POST_POSTIMAGE, uuid).execute();
+	    if(bmp != null && image_path!=null && !"".equals(image_path)){
+			new ImageUploadTask(this, image_path, Constants.URL_SERVER_HOST+Constants.URI_POST_POSTIMAGE,
+					res_user, res_content, res_latitude, res_longitude).execute();
 	    }else {
 	    
 			// 서버에 글을 등록
