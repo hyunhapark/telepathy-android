@@ -85,7 +85,21 @@ public class GetMypostsTask extends AsyncTask<Void, Void, Void>
 				e.printStackTrace();
 			}
 			PostItem pi = null;
-			ArrayList<CommentItem> cmt = null;
+			ArrayList<CommentItem> cmt = new ArrayList<CommentItem>();
+			JSONObject jcmts;
+			try {
+				jcmts = json.getJSONObject("p_comments");
+				int ccnt = jcmts.getInt("cnt");
+				JSONArray cmts = jcmts.getJSONArray("arr");
+				for (int j=0;j<ccnt;j++){
+					JSONObject jcmt = cmts.getJSONObject(i);
+					CommentItem ci = new CommentItem(jcmt.getString("c_user"),
+							jcmt.getString("c_date"), jcmt.getString("c_content")); 
+					cmt.add(ci);
+				}
+			} catch (JSONException e1) {
+				e1.printStackTrace();
+			}
 			try {
 				pi = new PostItem(json.getString("_id"),
 						json.getString("p_user"), json.getString("p_date"), json.getString("p_image"),
