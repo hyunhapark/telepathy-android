@@ -22,6 +22,8 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -37,6 +39,8 @@ public class MainActivity extends Activity {
 	static final int WRONG_IDPW = 2;
 	static final int NETWORK_ERROR = 3;
 	
+	static final int ActivityCode = 2;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -46,6 +50,26 @@ public class MainActivity extends Activity {
 		actionBar = getActionBar();
 		actionBar.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#7beda7")));
 		actionBar.setIcon(R.drawable.white);
+	}
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		// Inflate the menu; this adds items to the action bar if it is present.
+		getMenuInflater().inflate(R.menu.tab, menu);
+		return true;
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		// Handle action bar item clicks here. The action bar will
+		// automatically handle clicks on the Home/Up button, so long
+		// as you specify a parent activity in AndroidManifest.xml.
+		int id = item.getItemId();
+		if (id == R.id.action_settings) {
+			startActivity(new Intent(this, SettingsActivity.class));
+			return true;
+		}
+		return super.onOptionsItemSelected(item);
 	}
 	
 	public void onLogin(View v){
@@ -106,7 +130,8 @@ public class MainActivity extends Activity {
 	               if (login_state==SUCCESS) { // 로그인 성공
 	                  Log.d("comment","SUCCESS");
 	                  Intent intent = new Intent(getApplicationContext(), TabActivity.class);
-	                  intent.putExtra("ID", id);
+	                  intent.putExtra("id", id);
+	                  intent.putExtra("Activity", ActivityCode);
 	                  startActivity(intent);
 	                  finish();
 	                  

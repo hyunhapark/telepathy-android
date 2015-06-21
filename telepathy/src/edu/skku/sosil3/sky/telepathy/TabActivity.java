@@ -9,7 +9,6 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -20,8 +19,11 @@ import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v4.widget.SwipeRefreshLayout.OnRefreshListener;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -35,7 +37,7 @@ import android.widget.Toast;
 import android.widget.TabHost.OnTabChangeListener;
 import android.widget.TextView;
 
-public class TabActivity extends Activity {
+public class TabActivity extends Activity implements OnRefreshListener {
 
 	TabHost tabHost;
 	ListView ListOne;
@@ -52,6 +54,8 @@ public class TabActivity extends Activity {
 	Bitmap bmp = null;
 	ActionBar actionBar;
 	String id;
+	Intent intent;
+	SwipeRefreshLayout refreshLayout;
 	
 	static String SAMPLEIMG = "photo.png";
 	private final static int ACT_CAMERA = 1;
@@ -65,12 +69,21 @@ public class TabActivity extends Activity {
 
 		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
 		
+		intent = getIntent();
+		id = intent.getStringExtra("id");
+		if(preferences.getBoolean("pref_auto_login", true) && intent.getIntExtra("Activity", 0) == MainActivity.ActivityCode){
+			SharedPreferences.Editor editor = preferences.edit();
+			editor.putString("id", id);
+			editor.commit();
+		}
+		
 		ListOne = (ListView) findViewById(R.id.two_list);
 		ListTwo = (ListView) findViewById(R.id.three_list);
 		anonymity = (CheckBox) findViewById(R.id.one_anonymity);
 		date = (TextView) findViewById(R.id.one_date);
 		image = (ImageView) findViewById(R.id.one_image);
 		content = (EditText) findViewById(R.id.one_content);
+		refreshLayout = (SwipeRefreshLayout) findViewById(R.id.two_swipe);
 		
 		SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd");
 		date.setText(format.format(new Date()));
@@ -78,6 +91,8 @@ public class TabActivity extends Activity {
 		actionBar = getActionBar();
 		actionBar.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#7beda7")));
 		actionBar.setIcon(R.drawable.white);
+		
+		// refreshLayout.setOnRefreshListener(this); XXX
 		
 		// 서버 연결, 데이터 수집
 		ArrayList<PostItem> array1 = new ArrayList<PostItem>();
@@ -200,6 +215,11 @@ public class TabActivity extends Activity {
         	adapter2.settxtSize(txtSize);
         	adapter1.notifyDataSetChanged();
         	adapter2.notifyDataSetChanged();
+    		if(sharedPreferences.getBoolean("pref_auto_login", true) && intent.getIntExtra("Activity", 0) == MainActivity.ActivityCode){
+    			SharedPreferences.Editor editor = sharedPreferences.edit();
+				editor.putString("id", id);
+				editor.commit();
+    		}
 		}
 		
 	    if(resultCode != RESULT_OK){
@@ -247,5 +267,19 @@ public class TabActivity extends Activity {
 		}
 		
 		// 서버에 글을 등록
+	}
+
+	@Override
+	public void onRefresh() {
+		// TODO Auto-generated method stub
+		new Handler().postDelayed(new Runnable(){
+
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+				refreshLayout.setRefreshing(false);
+			}
+			
+		}, 2000);
 	}
 }

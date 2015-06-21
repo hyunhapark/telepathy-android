@@ -113,7 +113,8 @@ public class RegisterActivity extends Activity {
 	               
 	               if (register_state==SUCCESS) { // 로그인 성공
 	                  Log.d("Register","comment : SUCCESS");
-	                  startActivity(new Intent(getApplicationContext(), TabActivity.class));
+	                  Toast.makeText(getApplicationContext(), "회원가입이 완료되었습니다.", Toast.LENGTH_SHORT)
+                      .show();
 	                  finish();
 	                  
 	               } else if (register_state==WRONG_ID) { // 로그인 실패 - ID나 암호가 잘못됨
