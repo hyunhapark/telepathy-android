@@ -21,6 +21,7 @@ public class PostAdapter extends BaseAdapter {
 	LayoutInflater inflater;
 	ImageLoader imageLoader;
 	DisplayImageOptions options;
+	int txtSize = 16;
 
 	public PostAdapter(Context context, int layoutRes, ArrayList<PostItem> list) {
 		this.context = context;
@@ -28,9 +29,13 @@ public class PostAdapter extends BaseAdapter {
 		this.list = list;
 		inflater = LayoutInflater.from(context);
 		imageLoader = ImageLoader.getInstance();
-		options = new DisplayImageOptions.Builder().showImageOnLoading(R.drawable.ic_launcher).showImageForEmptyUri(R.drawable.ic_launcher).showImageOnFail(R.drawable.ic_launcher).resetViewBeforeLoading(true).cacheInMemory(true).cacheOnDisk(true).considerExifParams(true).build();
+		options = new DisplayImageOptions.Builder().showImageOnLoading(R.drawable.icon).showImageForEmptyUri(R.drawable.icon).showImageOnFail(R.drawable.icon).resetViewBeforeLoading(true).cacheInMemory(true).cacheOnDisk(true).considerExifParams(true).build();
 	}
 
+	public void settxtSize(int txtSize){
+		this.txtSize = txtSize;
+	}
+	
 	public int getCount() {
 		return list.size();
 	}
@@ -56,12 +61,16 @@ public class PostAdapter extends BaseAdapter {
 		
 		ImageView image = (ImageView) convertView.findViewById(R.id.post_image);
 		String imageUrl = list.get(position).getPostImage();
-		if(!imageUrl.isEmpty()){
+		if(imageUrl == null || !imageUrl.isEmpty()){
 			imageLoader.displayImage(imageUrl, image, options);
+		}
+		else{
+			image.setVisibility(View.GONE);
 		}
 		
 		TextView content = (TextView) convertView.findViewById(R.id.post_content);
 		content.setText(list.get(position).getPostContent());
+		content.setTextSize(txtSize);
 		
 		if(list.get(position).getPostComments() != null){
 			ExpandableListView comments = (ExpandableListView) convertView.findViewById(R.id.post_comments);

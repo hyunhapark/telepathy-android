@@ -1,7 +1,9 @@
 package edu.skku.sosil3.sky.telepathy;
 
+import android.app.ActionBar;
 import android.app.Activity;
-import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -15,6 +17,7 @@ public class RegisterActivity extends Activity {
 	EditText edit_pw;
 	EditText edit_repw;
 	EditText edit_nickname;
+	ActionBar actionBar;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -24,25 +27,10 @@ public class RegisterActivity extends Activity {
 		edit_pw = (EditText) findViewById(R.id.register_pw);
 		edit_repw = (EditText) findViewById(R.id.register_repw);
 		edit_nickname = (EditText) findViewById(R.id.register_nickname);
-	}
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.register, menu);
-		return true;
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		// Handle action bar item clicks here. The action bar will
-		// automatically handle clicks on the Home/Up button, so long
-		// as you specify a parent activity in AndroidManifest.xml.
-		int id = item.getItemId();
-		if (id == R.id.action_settings) {
-			return true;
-		}
-		return super.onOptionsItemSelected(item);
+		
+		actionBar = getActionBar();
+		actionBar.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#7beda7")));
+		actionBar.setIcon(R.drawable.white);
 	}
 	
 	public void onRegisterEnd(View v){

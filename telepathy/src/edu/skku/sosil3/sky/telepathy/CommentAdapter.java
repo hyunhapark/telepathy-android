@@ -74,12 +74,14 @@ public class CommentAdapter extends BaseExpandableListAdapter {
 	public View getGroupView(int groupPosition, boolean isExpanded,
 			View convertView, ViewGroup parent) {
 		if(convertView == null){
-			convertView = inflater.inflate(android.R.layout.simple_expandable_list_item_1, null);
+			convertView = inflater.inflate(R.layout.comment_group, null);
 		}
 		
-		TextView text = (TextView) convertView.findViewById(android.R.id.text1);
-		text.setText("댓글보기");
-		text.setTextSize(16);
+		TextView text = (TextView) convertView.findViewById(R.id.comment_group_text);
+		text.setText("댓글 목록");
+		
+		TextView number = (TextView) convertView.findViewById(R.id.comment_group_number);
+		number.setText("(" + getChildrenCount(groupPosition) + ")");
 		
 		return convertView;
 	}

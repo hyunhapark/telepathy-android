@@ -5,16 +5,22 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -24,6 +30,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TabHost;
+import android.widget.TabWidget;
 import android.widget.Toast;
 import android.widget.TabHost.OnTabChangeListener;
 import android.widget.TextView;
@@ -33,6 +40,8 @@ public class TabActivity extends Activity {
 	TabHost tabHost;
 	ListView ListOne;
 	ListView ListTwo;
+	PostAdapter adapter1;
+	PostAdapter adapter2;
 	CheckBox anonymity;
 	TextView date;
 	ImageView image;
@@ -41,10 +50,12 @@ public class TabActivity extends Activity {
 	double Long;
 	Dialog dialog;
 	Bitmap bmp = null;
+	ActionBar actionBar;
 	
 	static String SAMPLEIMG = "photo.png";
 	private final static int ACT_CAMERA = 1;
 	private final static int ACT_GALLERY = 2;
+	private final static int SETTINGS_INFO = 3;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +71,10 @@ public class TabActivity extends Activity {
 		
 		SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd");
 		date.setText(format.format(new Date()));
+
+		actionBar = getActionBar();
+		actionBar.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#7beda7")));
+		actionBar.setIcon(R.drawable.white);
 		
 		// 서버 연결, 데이터 수집
 		ArrayList<PostItem> array1 = new ArrayList<PostItem>();
@@ -75,11 +90,17 @@ public class TabActivity extends Activity {
 		array2.add(new PostItem(1, "조은현", "2015/04/25", "", "도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배", commentarray1, 100.0, 100.0));
 		array2.add(new PostItem(1, "조은현", "2015/04/25", "http://sw.skku.ac.kr/image/student/wats/popup/project_sum.jpg", "ㅎㅎㅎ2", commentarray2, 100.0, 100.0));
 		// 데이터 수집 끝
+
+		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+		int txtSize = Integer.parseInt(preferences.getString("pref_content_text_size", "16"));
+		System.out.println(txtSize);
 		
-		PostAdapter adapter1 = new PostAdapter(this, R.layout.post, array1);
+		adapter1 = new PostAdapter(this, R.layout.post, array1);
+        adapter1.settxtSize(txtSize);
 		ListOne.setAdapter(adapter1);
 		
-		PostAdapter adapter2 = new PostAdapter(this, R.layout.post, array2);
+		adapter2 = new PostAdapter(this, R.layout.post, array2);
+        adapter2.settxtSize(txtSize);
 		ListTwo.setAdapter(adapter2);
 		
 		tabHost = (TabHost) findViewById(R.id.tabhost);
@@ -87,24 +108,30 @@ public class TabActivity extends Activity {
 
 		TabHost.TabSpec spec = tabHost.newTabSpec("tab1");
 		spec.setContent(R.id.tab_fragment1);
-		spec.setIndicator("1");
+		spec.setIndicator("글쓰기");
 		// spec.setIndicator("", getResources().getDrawable(R.drawable.)); 이거로 탭에 이미지버튼을 넣을 수 있음
 		tabHost.addTab(spec);
 		
 		spec = tabHost.newTabSpec("tab2");
 		spec.setContent(R.id.tab_fragment2);
-		spec.setIndicator("2");
+		spec.setIndicator("뉴스피드");
 		// spec.setIndicator("", getResources().getDrawable(R.drawable.));
 		tabHost.addTab(spec);
 
 		spec = tabHost.newTabSpec("tab3");
 		spec.setContent(R.id.tab_fragment3);
-		spec.setIndicator("3");
+		spec.setIndicator("내가 쓴 글");
 		// spec.setIndicator("", getResources().getDrawable(R.drawable.));
 		tabHost.addTab(spec);
-
-		tabHost.setCurrentTab(1);
 		
+		TabWidget tabWidget = tabHost.getTabWidget();
+		for(int i=0; i<3; i++){
+			TextView tv = (TextView) tabWidget.getChildAt(i).findViewById(android.R.id.title);
+			tv.setTextColor(Color.parseColor("#FFFFFF"));
+			tv.setTextSize(16);
+		}
+		
+		tabHost.setCurrentTab(1);
 		tabHost.setOnTabChangedListener(new OnTabChangeListener() { // 탭 클릭되었을때 호출되는 메소드
 			
 			@Override
@@ -129,7 +156,7 @@ public class TabActivity extends Activity {
 		// as you specify a parent activity in AndroidManifest.xml.
 		int id = item.getItemId();
 		if (id == R.id.action_settings) {
-			startActivity(new Intent(this, SettingsActivity.class));
+			startActivityForResult(new Intent(this, SettingsActivity.class), SETTINGS_INFO);
 			return true;
 		}
 		return super.onOptionsItemSelected(item);
@@ -163,6 +190,15 @@ public class TabActivity extends Activity {
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		// TODO Auto-generated method stub
 		super.onActivityResult(requestCode, resultCode, data);
+		
+		if(requestCode == SETTINGS_INFO){
+        	SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        	int txtSize = Integer.parseInt(sharedPreferences.getString("pref_content_text_size", "16"));
+        	adapter1.settxtSize(txtSize);
+        	adapter2.settxtSize(txtSize);
+        	adapter1.notifyDataSetChanged();
+        	adapter2.notifyDataSetChanged();
+		}
 		
 	    if(resultCode != RESULT_OK){
   			return;
