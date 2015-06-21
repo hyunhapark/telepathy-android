@@ -16,7 +16,7 @@ import android.os.AsyncTask;
 import android.widget.Toast;
 
 @SuppressWarnings("deprecation")
-public class GetNewsfeedTask extends AsyncTask<Void, Void, Void>
+public class GetMypostsTask extends AsyncTask<Void, Void, Void>
 {
 	JSONObject data = null;
 	String url = null;
@@ -24,7 +24,7 @@ public class GetNewsfeedTask extends AsyncTask<Void, Void, Void>
 	TabActivity ta;
 	
 	
-	public GetNewsfeedTask(Context ctx) {
+	public GetMypostsTask(Context ctx) {
 		super();
 		this.ctx = ctx;
 		this.ta = (TabActivity) ctx; 
@@ -36,7 +36,7 @@ public class GetNewsfeedTask extends AsyncTask<Void, Void, Void>
 		this.url = Constants.URL_SERVER_HOST+Constants.URI_GET_NEWSFEED+"/anonymous/"+p_lati+"/"+p_long+"/"+Constants.DEFAULT_PAGE_SIZE+"/0";
 	}
 	
-	public GetNewsfeedTask(Context ctx, String url) {
+	public GetMypostsTask(Context ctx, String url) {
 		super();
 		this.ctx = ctx;
 		this.ta = (TabActivity) ctx;
@@ -62,7 +62,6 @@ public class GetNewsfeedTask extends AsyncTask<Void, Void, Void>
 	protected void onPostExecute(Void result) {
 		
 		super.onPostExecute(result);
-		//Log.i(null,data.toString());
 		
 		int cnt=0;
 		JSONArray arr;
@@ -93,14 +92,14 @@ public class GetNewsfeedTask extends AsyncTask<Void, Void, Void>
 						json.getString("p_content"), cmt,
 						Double.parseDouble(json.getString("p_lati")),
 						Double.parseDouble(json.getString("p_long")));
-				ta.array1.add(pi);
+				ta.array2.add(pi);
 			} catch (NumberFormatException e) {
 				e.printStackTrace();
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
 		}
-		ta.adapter1.notifyDataSetChanged();
+		ta.adapter2.notifyDataSetChanged();
 	}
 
 	@Override

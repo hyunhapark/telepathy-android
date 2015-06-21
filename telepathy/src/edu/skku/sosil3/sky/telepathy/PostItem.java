@@ -3,7 +3,7 @@ package edu.skku.sosil3.sky.telepathy;
 import java.util.ArrayList;
 
 public class PostItem {
-	int p_id;
+	String p_id;
 	String p_user;
 	String p_date;
 	String p_image;
@@ -12,22 +12,22 @@ public class PostItem {
 	double p_lati;
 	double p_long;
 	
-	public PostItem(int postId, String postUser, String postDate,
-			String postImage, String postContent,
-			ArrayList<CommentItem> postComments, double postLati,
-			double postLong) {
-		super();
-		p_id = postId;
-		p_user = postUser;
-		p_date = postDate;
-		p_image = postImage;
-		p_content = postContent;
-		p_comments = postComments;
-		p_lati = postLati;
-		p_long = postLong;
-	}
 	
-	public int getPostId() {
+	public PostItem(String p_id, String p_user, String p_date, String p_image,
+			String p_content, ArrayList<CommentItem> p_comments, double p_lati,
+			double p_long) {
+		super();
+		this.p_id = p_id;
+		this.p_user = p_user;
+		this.p_date = p_date;
+		this.p_image = p_image;
+		this.p_content = p_content;
+		this.p_comments = p_comments;
+		this.p_lati = p_lati;
+		this.p_long = p_long;
+	}
+
+	public String getPostId() {
 		return p_id;
 	}
 	

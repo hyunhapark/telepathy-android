@@ -11,6 +11,8 @@ public class Constants {
 	public static final String URI_POST_POST = "/post";
 	public static final String URI_POST_COMMENT = "/comment";
 	public static final String URI_GET_NEWSFEED = "/newsfeed";
+	public static final String URI_GET_MYPOSTS = "/myposts";
+	public static final int DEFAULT_PAGE_SIZE = 15;
 	
 	/* Update Checking. */
 	public static final String URI_GET_MIN_VERSION = "/app/android/min-version";

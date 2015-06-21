@@ -5,12 +5,12 @@ public class CommentItem {
 	String c_date;
 	String c_content;
 	
-	public CommentItem(String commentUser, String commentDate,
-			String commentContent) {
+
+	public CommentItem(String c_user, String c_date, String c_content) {
 		super();
-		c_user = commentUser;
-		c_date = commentDate;
-		c_content = commentContent;
+		this.c_user = c_user;
+		this.c_date = c_date;
+		this.c_content = c_content;
 	}
 
 	public String getCommentUser() {
