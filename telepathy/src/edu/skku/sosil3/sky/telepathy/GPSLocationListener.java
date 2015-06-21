@@ -19,7 +19,7 @@ public class GPSLocationListener  implements LocationListener {
 	private static final float UPDATE_DISTANCE_INTERVAL = 5.0f; // 최소 GPS 정보 업데이트 거리(m). 거리가 이만큼 변하면 업데이트
 	private static final long UPDATE_TIME_INTERVAL = 1000 * 30; // 최소 GPS 정보 업데이트 시간(ms). 시간이 이만큼 지나면 업데이트
 	
-	private static final double DATA_GET_FAILED = 1000000.0;
+	protected static final double DATA_GET_FAILED = 1000000.0;
 	
 	public GPSLocationListener(LocationManager locationManager) {
 		this.locationManager=locationManager;
