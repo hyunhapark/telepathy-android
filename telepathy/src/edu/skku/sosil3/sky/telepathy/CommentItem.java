@@ -1,27 +1,27 @@
 package edu.skku.sosil3.sky.telepathy;
 
 public class CommentItem {
-	String CommentUser;
-	String CommentDate;
-	String CommentContent;
+	String c_user;
+	String c_date;
+	String c_content;
 	
 	public CommentItem(String commentUser, String commentDate,
 			String commentContent) {
 		super();
-		CommentUser = commentUser;
-		CommentDate = commentDate;
-		CommentContent = commentContent;
+		c_user = commentUser;
+		c_date = commentDate;
+		c_content = commentContent;
 	}
 
 	public String getCommentUser() {
-		return CommentUser;
+		return c_user;
 	}
 
 	public String getCommentDate() {
-		return CommentDate;
+		return c_date;
 	}
 
 	public String getCommentContent() {
-		return CommentContent;
+		return c_content;
 	}
 }
