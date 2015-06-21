@@ -53,10 +53,10 @@ import android.widget.Toast;
 public class TabActivity extends Activity {
 
 	TabHost tabHost;
-	ListView ListOne;
-	ListView ListTwo;
-	PostAdapter adapter1;
-	PostAdapter adapter2;
+	public static ListView ListOne = null;
+	public static ListView ListTwo = null;
+	public static PostAdapter adapter1 = null;
+	public static PostAdapter adapter2 = null;
 	CheckBox anonymity;
 	TextView date;
 	ImageView image;
@@ -68,6 +68,9 @@ public class TabActivity extends Activity {
 	ActionBar actionBar;
 	String id;
 	Intent intent;
+	public SharedPreferences preferences;
+	public static ArrayList<PostItem> array1;
+	public static ArrayList<PostItem> array2;
 	
 	static String SAMPLEIMG = "photo.png";
 	private final static int ACT_CAMERA = 1;
@@ -80,12 +83,13 @@ public class TabActivity extends Activity {
 	static final int LOCATION_NOT_FOUND = 2;
 	static final int NETWORK_ERROR = 3;
 	
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_tab);
 
-		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+		preferences = PreferenceManager.getDefaultSharedPreferences(this);
 		
 		intent = getIntent();
 		id = intent.getStringExtra("id");
@@ -108,22 +112,14 @@ public class TabActivity extends Activity {
 		actionBar = getActionBar();
 		actionBar.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#7beda7")));
 		actionBar.setIcon(R.drawable.white);
+
+		array1 = new ArrayList<PostItem>();
+		array2 = new ArrayList<PostItem>();
 		
 		// 서버 연결, 데이터 수집
-		ArrayList<PostItem> array1 = get_newsfeed();
-		ArrayList<PostItem> array2 = get_my_posts();
+		get_newsfeed();
+		get_my_posts();
 		// 데이터 수집 끝
-
-		int txtSize = Integer.parseInt(preferences.getString("pref_content_text_size", "16"));
-		System.out.println(txtSize);
-		
-		adapter1 = new PostAdapter(this, R.layout.post, array1);
-        adapter1.settxtSize(txtSize);
-		ListOne.setAdapter(adapter1);
-		
-		adapter2 = new PostAdapter(this, R.layout.post, array2);
-        adapter2.settxtSize(txtSize);
-		ListTwo.setAdapter(adapter2);
 		
 		tabHost = (TabHost) findViewById(R.id.tabhost);
 		tabHost.setup();
@@ -155,24 +151,23 @@ public class TabActivity extends Activity {
 		
 		tabHost.setCurrentTab(1);
 		tabHost.setOnTabChangedListener(new OnTabChangeListener() { // 탭 클릭되었을때 호출되는 메소드
-			
 			@Override
 			public void onTabChanged(String tabId) {
-				// TODO Auto-generated method stub
-				
 			}
 		});
 	}
 
-	private ArrayList<PostItem> get_newsfeed() {
-		ArrayList<PostItem> array1 = new ArrayList<PostItem>();
+	private void get_newsfeed() {
 		array1.add(new PostItem(1, "조은현", "2015/04/25", "http://sw.skku.ac.kr/image/student/wats/popup/project_sum.jpg", "ㅎㅎㅎ1", null, 100.0, 100.0));
 		array1.add(new PostItem(1, "조은현", "2015/04/25", "", "ㅎㅎㅎ2", null, 100.0, 100.0));
-		return array1;
+		
+		int txtSize = Integer.parseInt(preferences.getString("pref_content_text_size", "16"));
+		adapter1 = new PostAdapter(this, R.layout.post, array1);
+        adapter1.settxtSize(txtSize);
+		ListOne.setAdapter(adapter1);
 	}
 	
-	private ArrayList<PostItem> get_my_posts() {
-		ArrayList<PostItem> array2 = new ArrayList<PostItem>();
+	private void get_my_posts() {
 		ArrayList<CommentItem> commentarray1 = new ArrayList<CommentItem>();
 		ArrayList<CommentItem> commentarray2 = new ArrayList<CommentItem>();
 		commentarray1.add(new CommentItem("익명", "2015/04/26", "도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배"));
@@ -181,7 +176,10 @@ public class TabActivity extends Activity {
 		array2.add(new PostItem(1, "조은현", "2015/04/25", "", "도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배", commentarray1, 100.0, 100.0));
 		array2.add(new PostItem(1, "조은현", "2015/04/25", "http://sw.skku.ac.kr/image/student/wats/popup/project_sum.jpg", "ㅎㅎㅎ2", commentarray2, 100.0, 100.0));
 		
-		return array2;
+		int txtSize = Integer.parseInt(preferences.getString("pref_content_text_size", "16"));
+		adapter2 = new PostAdapter(this, R.layout.post, array2);
+        adapter2.settxtSize(txtSize);
+		ListTwo.setAdapter(adapter2);
 	}
 
 	@Override
