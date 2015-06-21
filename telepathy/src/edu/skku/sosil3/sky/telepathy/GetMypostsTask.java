@@ -13,6 +13,7 @@ import org.json.JSONObject;
 import android.content.Context;
 import android.location.LocationManager;
 import android.os.AsyncTask;
+import android.util.Log;
 import android.widget.Toast;
 
 @SuppressWarnings("deprecation")
@@ -23,18 +24,6 @@ public class GetMypostsTask extends AsyncTask<Void, Void, Void>
 	Context ctx;
 	TabActivity ta;
 	
-	
-	public GetMypostsTask(Context ctx) {
-		super();
-		this.ctx = ctx;
-		this.ta = (TabActivity) ctx; 
-		
-		LocationManager locationManager = (LocationManager) ctx.getSystemService(Context.LOCATION_SERVICE);
-        GPSLocationListener gpsLocationListener = new GPSLocationListener(locationManager);
-        double p_lati = gpsLocationListener.getLatitude(); // 위도
-        double p_long = gpsLocationListener.getLongitude(); // 경도
-		this.url = Constants.URL_SERVER_HOST+Constants.URI_GET_NEWSFEED+"/anonymous/"+p_lati+"/"+p_long+"/"+Constants.DEFAULT_PAGE_SIZE+"/0";
-	}
 	
 	public GetMypostsTask(Context ctx, String url) {
 		super();

@@ -6,6 +6,7 @@ import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.UUID;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -67,7 +68,7 @@ public class TabActivity extends Activity {
 	Dialog dialog;
 	Bitmap bmp = null;
 	ActionBar actionBar;
-	String id;
+	public static String id;
 	Intent intent;
 	public SharedPreferences preferences;
 	public ArrayList<PostItem> array1;
@@ -75,6 +76,7 @@ public class TabActivity extends Activity {
 	public double p_lati, p_long;
 	private int nf_page = 0;
 	private int mp_page = 0;
+	private String image_path;
 	
 	static String SAMPLEIMG = "photo.png";
 	private final static int ACT_CAMERA = 1;
@@ -131,6 +133,7 @@ public class TabActivity extends Activity {
         GPSLocationListener gpsLocationListener = new GPSLocationListener(locationManager);
         p_lati = gpsLocationListener.getLatitude(); // 위도
         p_long = gpsLocationListener.getLongitude(); // 경도
+	    gpsLocationListener.stopGettingLocation();
         
         nf_page = 0;
         mp_page = 0;
@@ -289,14 +292,15 @@ public class TabActivity extends Activity {
 	    switch(requestCode){
 	    	case ACT_CAMERA:
 	    		File file = new File(Environment.getExternalStorageDirectory(), SAMPLEIMG);
+	    		image_path = file.getAbsolutePath();
 	      		bmp = BitmapFactory.decodeFile(file.getAbsolutePath(), option);
-	      		file.delete();
+	      		//file.delete(); TODO
 				break;
 	        case ACT_GALLERY: 
 	        	Cursor c = this.getContentResolver().query(data.getData(), null, null, null, null);
 	            c.moveToNext();
-	            String path = c.getString(c.getColumnIndex(MediaStore.MediaColumns.DATA));
-	            Uri uri = Uri.fromFile(new File(path));
+	            image_path = c.getString(c.getColumnIndex(MediaStore.MediaColumns.DATA));
+	            Uri uri = Uri.fromFile(new File(image_path));
 	            c.close();
 	            bmp = BitmapFactory.decodeFile(uri.getPath(), option);
 	        	break;
@@ -310,123 +314,142 @@ public class TabActivity extends Activity {
 	    }
 	}
 	
+	@SuppressWarnings("unused")
 	public void onFinish(View v){
-	      Boolean res_anonymity = anonymity.isChecked(); // 익명 여부
+		Boolean res_anonymity = anonymity.isChecked(); // 익명 여부
+
+		final String res_user; // 이름
+		final String res_content = content.getText().toString(); // 글
+		final String res_image = ""; // 이미지
+
+		LocationManager locationManager = (LocationManager) this
+				.getSystemService(Context.LOCATION_SERVICE);
+		GPSLocationListener gpsLocationListener = new GPSLocationListener(
+				locationManager);
+		final double res_latitude = gpsLocationListener.getLatitude(); // 위도
+		final double res_longitude = gpsLocationListener.getLongitude(); // 경도
+		gpsLocationListener.stopGettingLocation();
+
+		if (res_anonymity) { // 익명 여부 판단
+			res_user = "익명";
+		} else {
+			res_user = id;
+		}
 	      
-	      final String res_user; // 이름
-	      final String res_content = content.getText().toString(); // 글
-	      final String res_image = ""; // 이미지
-	      
-	      LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-	      GPSLocationListener gpsLocationListener = new GPSLocationListener(locationManager);
-	      final double res_latitude = gpsLocationListener.getLatitude(); // 위도
-	      final double res_longitude = gpsLocationListener.getLongitude(); // 경도
-	      gpsLocationListener.stopGettingLocation();
-	      
-	      if(res_anonymity) { // 익명 여부 판단
-	         res_user = "익명";
-	      } else {
-	         res_user = id;
-	      }
-	      
-	      // 서버에 글을 등록
-	      new Thread() {
-	            
-	            @SuppressWarnings("deprecation")
-	            public void run() {
-	               upload_state = DEFAULT;
-
-	            String uriString = "http://telepathy.hyunha.org/post"; // 업로드할 url
-	            ArrayList<BasicNameValuePair> Parameter = new ArrayList<BasicNameValuePair>();
-
-	            try {
-	               URI uri = new URI(uriString);
-	               HttpClient httpclient = new DefaultHttpClient();
-	               HttpPost httpPost = new HttpPost(uri);
-
-	               Parameter.add(new BasicNameValuePair("p_user", res_user));
-	               Parameter.add(new BasicNameValuePair("p_image", res_image));
-	               Parameter.add(new BasicNameValuePair("p_content", res_content));
-	               Parameter.add(new BasicNameValuePair("p_lati", Double.toString(res_latitude)));
-	               Parameter.add(new BasicNameValuePair("p_long", Double.toString(res_longitude)));
-	               
-	               Log.d("Upload", "Uploading data");
-	               Log.d("Upload", "- "+res_user);
-	               Log.d("Upload", "- "+res_image);
-	               Log.d("Upload", "- "+res_content);
-	               Log.d("Upload", "- "+Double.toString(res_latitude));
-	               Log.d("Upload", "- "+Double.toString(res_longitude));
-	               
-	               httpPost.setEntity(new UrlEncodedFormEntity(Parameter,"UTF-8"));
-
-	               // JSON data 얻어내기
-	               HttpResponse httpResponse = httpclient.execute(httpPost);
-	               String responseString = EntityUtils.toString(
-	                     httpResponse.getEntity(), HTTP.UTF_8);
-	               Log.d("Upload", "responseString");
-	               Log.d("Upload", responseString);
-
-	               // JSON data에서 success 여부 알아내기
-	               JSONObject jsonObject = new JSONObject(responseString);
-	               String success = jsonObject.getString("success");
-	               Log.d("Upload", "success : " + success);
-
-	               if (res_latitude != GPSLocationListener.DATA_GET_FAILED) upload_state = SUCCESS;
-	               else upload_state = LOCATION_NOT_FOUND;
-
-	            } catch (IOException e) {
-	               upload_state = NETWORK_ERROR;
-	            } catch (JSONException e) {
-	               upload_state = NETWORK_ERROR;
-	            } catch (Exception e) {
-	               e.printStackTrace();
-	            }
-
-	            if (upload_state == SUCCESS) { // 업로드 성공
-	               Log.d("Upload", "comment : SUCCESS");
-	               runOnUiThread(new Runnable() {
-	                  public void run() {
-	                     Toast.makeText(getApplicationContext(),
-	                           "성공적으로 업로드하였습니다.", Toast.LENGTH_SHORT)
-	                           .show();
-	                  }
-	               });
-	               startActivity(new Intent(getApplicationContext(), TabActivity.class));
-	               finish();
-	               
-	            } else if (upload_state == LOCATION_NOT_FOUND) { // 업로드 성공 - 좌표 찾기 실패
-	               Log.d("Upload", "comment : LOCATION_NOT_FOUND");
-	               runOnUiThread(new Runnable() {
-	                  public void run() {
-	                     Toast.makeText(getApplicationContext(),
-	                           "좌표 찾기에 실패하였습니다. 좌표에 대한 정보 없이 업로드합니다.", Toast.LENGTH_SHORT)
-	                           .show();
-	                  }
-	               });
-	               startActivity(new Intent(getApplicationContext(), TabActivity.class));
-	               finish();
-
-	            } else if (upload_state == NETWORK_ERROR) { // 업로드 실패 - 네트워크 오류
-	               Log.d("Upload", "comment : NETWORK_ERROR");
-	               runOnUiThread(new Runnable() {
-	                  public void run() {
-	                     Toast.makeText(getApplicationContext(),
-	                           "네트워크 상태를 확인하십시오.", Toast.LENGTH_SHORT)
-	                           .show();
-	                  }
-	               });
-
-	            } else { // 업로드 실패 - 알 수 없는 오류
-	               Log.d("Register", "comment : DEFAULT");
-	               runOnUiThread(new Runnable() {
-	                  public void run() {
-	                     Toast.makeText(getApplicationContext(),
-	                           "알 수 없는 오류가 발생했습니다.", Toast.LENGTH_SHORT)
-	                           .show();
-	                  }
-	               });
-	            }
-	         }
-	      }.start(); // thread end
-	   }
+	    if(bmp != null && image_path!=null && !"".equals(image_path) && 1==2){
+	    	String uuid = UUID.randomUUID().toString();
+			new ImageUploadTask(this, image_path, Constants.URL_SERVER_HOST+Constants.URI_POST_POSTIMAGE, uuid).execute();
+	    }else {
+	    
+			// 서버에 글을 등록
+			new Thread() {
+	
+				@SuppressWarnings("deprecation")
+				public void run() {
+					upload_state = DEFAULT;
+	
+					String uriString = "http://telepathy.hyunha.org/post"; // 업로드할
+																			// url
+					ArrayList<BasicNameValuePair> Parameter = new ArrayList<BasicNameValuePair>();
+	
+					try {
+						URI uri = new URI(uriString);
+						HttpClient httpclient = new DefaultHttpClient();
+						HttpPost httpPost = new HttpPost(uri);
+	
+						Parameter.add(new BasicNameValuePair("p_user", res_user));
+						Parameter.add(new BasicNameValuePair("p_image", res_image));
+						Parameter.add(new BasicNameValuePair("p_content",
+								res_content));
+						Parameter.add(new BasicNameValuePair("p_lati", Double
+								.toString(res_latitude)));
+						Parameter.add(new BasicNameValuePair("p_long", Double
+								.toString(res_longitude)));
+	
+						Log.d("Upload", "Uploading data");
+						Log.d("Upload", "- " + res_user);
+						Log.d("Upload", "- " + res_image);
+						Log.d("Upload", "- " + res_content);
+						Log.d("Upload", "- " + Double.toString(res_latitude));
+						Log.d("Upload", "- " + Double.toString(res_longitude));
+	
+						httpPost.setEntity(new UrlEncodedFormEntity(Parameter,
+								"UTF-8"));
+	
+						// JSON data 얻어내기
+						HttpResponse httpResponse = httpclient.execute(httpPost);
+						String responseString = EntityUtils.toString(
+								httpResponse.getEntity(), HTTP.UTF_8);
+						Log.d("Upload", "responseString");
+						Log.d("Upload", responseString);
+	
+						// JSON data에서 success 여부 알아내기
+						JSONObject jsonObject = new JSONObject(responseString);
+						String success = jsonObject.getString("success");
+						Log.d("Upload", "success : " + success);
+	
+						if (res_latitude != GPSLocationListener.DATA_GET_FAILED)
+							upload_state = SUCCESS;
+						else
+							upload_state = LOCATION_NOT_FOUND;
+	
+					} catch (IOException e) {
+						upload_state = NETWORK_ERROR;
+					} catch (JSONException e) {
+						upload_state = NETWORK_ERROR;
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+	
+					if (upload_state == SUCCESS) { // 업로드 성공
+						Log.d("Upload", "comment : SUCCESS");
+						runOnUiThread(new Runnable() {
+							public void run() {
+								Toast.makeText(getApplicationContext(),
+										"성공적으로 업로드하였습니다.", Toast.LENGTH_SHORT)
+										.show();
+							}
+						});
+						startActivity(new Intent(getApplicationContext(),
+								TabActivity.class));
+						finish();
+	
+					} else if (upload_state == LOCATION_NOT_FOUND) { // 업로드 성공 - 좌표
+																		// 찾기 실패
+						Log.d("Upload", "comment : LOCATION_NOT_FOUND");
+						runOnUiThread(new Runnable() {
+							public void run() {
+								Toast.makeText(getApplicationContext(),
+										"좌표 찾기에 실패하였습니다. 좌표에 대한 정보 없이 업로드합니다.",
+										Toast.LENGTH_SHORT).show();
+							}
+						});
+						startActivity(new Intent(getApplicationContext(),
+								TabActivity.class));
+						finish();
+	
+					} else if (upload_state == NETWORK_ERROR) { // 업로드 실패 - 네트워크 오류
+						Log.d("Upload", "comment : NETWORK_ERROR");
+						runOnUiThread(new Runnable() {
+							public void run() {
+								Toast.makeText(getApplicationContext(),
+										"네트워크 상태를 확인하십시오.", Toast.LENGTH_SHORT)
+										.show();
+							}
+						});
+	
+					} else { // 업로드 실패 - 알 수 없는 오류
+						Log.d("Register", "comment : DEFAULT");
+						runOnUiThread(new Runnable() {
+							public void run() {
+								Toast.makeText(getApplicationContext(),
+										"알 수 없는 오류가 발생했습니다.", Toast.LENGTH_SHORT)
+										.show();
+							}
+						});
+					}
+				}
+			}.start(); // thread end
+	    }
+	}
 }

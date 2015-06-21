@@ -33,6 +33,7 @@ public class GetNewsfeedTask extends AsyncTask<Void, Void, Void>
         GPSLocationListener gpsLocationListener = new GPSLocationListener(locationManager);
         double p_lati = gpsLocationListener.getLatitude(); // 위도
         double p_long = gpsLocationListener.getLongitude(); // 경도
+	      gpsLocationListener.stopGettingLocation();
 		this.url = Constants.URL_SERVER_HOST+Constants.URI_GET_NEWSFEED+"/anonymous/"+p_lati+"/"+p_long+"/"+Constants.DEFAULT_PAGE_SIZE+"/0";
 	}
 	
