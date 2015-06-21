@@ -10,6 +10,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.ExpandableListView;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -61,7 +64,8 @@ public class PostAdapter extends BaseAdapter {
 		
 		ImageView image = (ImageView) convertView.findViewById(R.id.post_image);
 		String imageUrl = list.get(position).getPostImage();
-		if(imageUrl == null || !imageUrl.isEmpty()){
+		if(imageUrl != null && !imageUrl.isEmpty()){
+			image.setVisibility(View.VISIBLE);
 			imageLoader.displayImage(imageUrl, image, options);
 		}
 		else{
@@ -110,6 +114,23 @@ public class PostAdapter extends BaseAdapter {
 				}
 			});
 		}
+		
+		final CheckBox anonymity = (CheckBox) convertView.findViewById(R.id.post_anonymity);
+		final EditText newcomment = (EditText) convertView.findViewById(R.id.post_newcomment);
+		Button newcommentfinish = (Button) convertView.findViewById(R.id.post_newcommentfinish);
+		newcommentfinish.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				Boolean res_anonymity = anonymity.isChecked();
+				String comment = newcomment.getText().toString();
+				newcomment.setText("");
+				
+				// 댓글을 서버에 전송
+			}
+		});
+		
 		
 		return convertView;
 	}
