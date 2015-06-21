@@ -34,7 +34,7 @@
 
     <TabWidget
         android:id="@android:id/tabs"
-        android:background="#7BEDA7"
+        android:background="#FFFFFF"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"

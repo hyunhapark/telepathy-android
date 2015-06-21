@@ -53,6 +53,7 @@ import android.widget.Toast;
 public class TabActivity extends Activity {
 
 	TabHost tabHost;
+	TabWidget tabWidget;
 	ListView ListOne;
 	ListView ListTwo;
 	PostAdapter adapter1;
@@ -106,7 +107,7 @@ public class TabActivity extends Activity {
 		date.setText(format.format(new Date()));
 
 		actionBar = getActionBar();
-		actionBar.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#7beda7")));
+		actionBar.setBackgroundDrawable(new ColorDrawable(Color.parseColor(preferences.getString("pref_ui_color", "#7beda7"))));
 		actionBar.setIcon(R.drawable.white);
 		
 		// 서버 연결, 데이터 수집
@@ -156,9 +157,11 @@ public class TabActivity extends Activity {
 		// spec.setIndicator("", getResources().getDrawable(R.drawable.));
 		tabHost.addTab(spec);
 		
-		TabWidget tabWidget = tabHost.getTabWidget();
+		tabWidget = tabHost.getTabWidget();
 		for(int i=0; i<3; i++){
-			TextView tv = (TextView) tabWidget.getChildAt(i).findViewById(android.R.id.title);
+			View tc = tabWidget.getChildAt(i);
+			tc.setBackgroundColor(Color.parseColor(preferences.getString("pref_ui_color", "#7beda7")));
+			TextView tv = (TextView) tc.findViewById(android.R.id.title);
 			tv.setTextColor(Color.parseColor("#FFFFFF"));
 			tv.setTextSize(16);
 		}
@@ -193,6 +196,14 @@ public class TabActivity extends Activity {
 		}
 		else if(id == R.id.action_refresh){
 			// 새로고침
+		}
+		else if(id == R.id.action_logout){
+			SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+			SharedPreferences.Editor editor = preferences.edit();
+			editor.putString("id", "EMPTY_");
+			editor.commit();
+			startActivity(new Intent(this, MainActivity.class));
+			finish();
 		}
 		return super.onOptionsItemSelected(item);
 	}
@@ -237,6 +248,12 @@ public class TabActivity extends Activity {
     			SharedPreferences.Editor editor = sharedPreferences.edit();
 				editor.putString("id", id);
 				editor.commit();
+    		}
+    		
+    		actionBar.setBackgroundDrawable(new ColorDrawable(Color.parseColor(sharedPreferences.getString("pref_ui_color", "#7beda7"))));
+    		for(int i=0; i<3; i++){
+    			View tc = tabWidget.getChildAt(i);
+    			tc.setBackgroundColor(Color.parseColor(sharedPreferences.getString("pref_ui_color", "#7beda7")));
     		}
 		}
 		
