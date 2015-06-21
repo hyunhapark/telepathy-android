@@ -95,18 +95,8 @@ public class TabActivity extends Activity implements OnRefreshListener {
 		// refreshLayout.setOnRefreshListener(this); XXX
 		
 		// 서버 연결, 데이터 수집
-		ArrayList<PostItem> array1 = new ArrayList<PostItem>();
-		array1.add(new PostItem(1, "조은현", "2015/04/25", "http://sw.skku.ac.kr/image/student/wats/popup/project_sum.jpg", "ㅎㅎㅎ1", null, 100.0, 100.0));
-		array1.add(new PostItem(1, "조은현", "2015/04/25", "", "ㅎㅎㅎ2", null, 100.0, 100.0));
-		
-		ArrayList<PostItem> array2 = new ArrayList<PostItem>();
-		ArrayList<CommentItem> commentarray1 = new ArrayList<CommentItem>();
-		ArrayList<CommentItem> commentarray2 = new ArrayList<CommentItem>();
-		commentarray1.add(new CommentItem("익명", "2015/04/26", "도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배"));
-		commentarray2.add(new CommentItem("김승현", "2015/04/26", "ㅡㅡ?"));
-		commentarray2.add(new CommentItem("박현하", "2015/04/26", "ㅇㅅㅇ;;"));
-		array2.add(new PostItem(1, "조은현", "2015/04/25", "", "도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배", commentarray1, 100.0, 100.0));
-		array2.add(new PostItem(1, "조은현", "2015/04/25", "http://sw.skku.ac.kr/image/student/wats/popup/project_sum.jpg", "ㅎㅎㅎ2", commentarray2, 100.0, 100.0));
+		ArrayList<PostItem> array1 = get_newsfeed();
+		ArrayList<PostItem> array2 = get_my_posts();
 		// 데이터 수집 끝
 
 		int txtSize = Integer.parseInt(preferences.getString("pref_content_text_size", "16"));
@@ -157,6 +147,26 @@ public class TabActivity extends Activity implements OnRefreshListener {
 				
 			}
 		});
+	}
+
+	private ArrayList<PostItem> get_newsfeed() {
+		ArrayList<PostItem> array1 = new ArrayList<PostItem>();
+		array1.add(new PostItem(1, "조은현", "2015/04/25", "http://sw.skku.ac.kr/image/student/wats/popup/project_sum.jpg", "ㅎㅎㅎ1", null, 100.0, 100.0));
+		array1.add(new PostItem(1, "조은현", "2015/04/25", "", "ㅎㅎㅎ2", null, 100.0, 100.0));
+		return array1;
+	}
+	
+	private ArrayList<PostItem> get_my_posts() {
+		ArrayList<PostItem> array2 = new ArrayList<PostItem>();
+		ArrayList<CommentItem> commentarray1 = new ArrayList<CommentItem>();
+		ArrayList<CommentItem> commentarray2 = new ArrayList<CommentItem>();
+		commentarray1.add(new CommentItem("익명", "2015/04/26", "도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배"));
+		commentarray2.add(new CommentItem("김승현", "2015/04/26", "ㅡㅡ?"));
+		commentarray2.add(new CommentItem("박현하", "2015/04/26", "ㅇㅅㅇ;;"));
+		array2.add(new PostItem(1, "조은현", "2015/04/25", "", "도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배", commentarray1, 100.0, 100.0));
+		array2.add(new PostItem(1, "조은현", "2015/04/25", "http://sw.skku.ac.kr/image/student/wats/popup/project_sum.jpg", "ㅎㅎㅎ2", commentarray2, 100.0, 100.0));
+		
+		return array2;
 	}
 
 	@Override
