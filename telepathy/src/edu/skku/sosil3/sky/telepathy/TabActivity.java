@@ -53,6 +53,7 @@ import android.widget.Toast;
 public class TabActivity extends Activity {
 
 	TabHost tabHost;
+	TabWidget tabWidget;
 	public static ListView ListOne = null;
 	public static ListView ListTwo = null;
 	public static PostAdapter adapter1 = null;
@@ -71,65 +72,69 @@ public class TabActivity extends Activity {
 	public SharedPreferences preferences;
 	public static ArrayList<PostItem> array1;
 	public static ArrayList<PostItem> array2;
-	
+
 	static String SAMPLEIMG = "photo.png";
 	private final static int ACT_CAMERA = 1;
 	private final static int ACT_GALLERY = 2;
 	private final static int SETTINGS_INFO = 3;
-	
+
 	static int upload_state = 0;
 	static final int DEFAULT = 0;
 	static final int SUCCESS = 1;
 	static final int LOCATION_NOT_FOUND = 2;
 	static final int NETWORK_ERROR = 3;
-	
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_tab);
 
 		preferences = PreferenceManager.getDefaultSharedPreferences(this);
-		
+
 		intent = getIntent();
 		id = intent.getStringExtra("id");
-		if(preferences.getBoolean("pref_auto_login", true) && intent.getIntExtra("Activity", 0) == MainActivity.ActivityCode){
+		if (preferences.getBoolean("pref_auto_login", true)
+				&& intent.getIntExtra("Activity", 0) == MainActivity.ActivityCode) {
 			SharedPreferences.Editor editor = preferences.edit();
 			editor.putString("id", id);
 			editor.commit();
 		}
-		
+
 		ListOne = (ListView) findViewById(R.id.two_list);
 		ListTwo = (ListView) findViewById(R.id.three_list);
 		anonymity = (CheckBox) findViewById(R.id.one_anonymity);
 		date = (TextView) findViewById(R.id.one_date);
 		image = (ImageView) findViewById(R.id.one_image);
 		content = (EditText) findViewById(R.id.one_content);
-		
+
 		SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd");
 		date.setText(format.format(new Date()));
 
 		actionBar = getActionBar();
-		actionBar.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#7beda7")));
+		actionBar
+				.setBackgroundDrawable(new ColorDrawable(Color
+						.parseColor(preferences.getString("pref_ui_color",
+								"#7beda7"))));
 		actionBar.setIcon(R.drawable.white);
 
 		array1 = new ArrayList<PostItem>();
 		array2 = new ArrayList<PostItem>();
-		
+
 		// 서버 연결, 데이터 수집
 		get_newsfeed();
 		get_my_posts();
 		// 데이터 수집 끝
-		
+
 		tabHost = (TabHost) findViewById(R.id.tabhost);
 		tabHost.setup();
 
 		TabHost.TabSpec spec = tabHost.newTabSpec("tab1");
 		spec.setContent(R.id.tab_fragment1);
 		spec.setIndicator("글쓰기");
-		// spec.setIndicator("", getResources().getDrawable(R.drawable.)); 이거로 탭에 이미지버튼을 넣을 수 있음
+		// spec.setIndicator("", getResources().getDrawable(R.drawable.)); 이거로
+		// 탭에 이미지버튼을 넣을 수 있음
 		tabHost.addTab(spec);
-		
+
 		spec = tabHost.newTabSpec("tab2");
 		spec.setContent(R.id.tab_fragment2);
 		spec.setIndicator("뉴스피드");
@@ -141,16 +146,20 @@ public class TabActivity extends Activity {
 		spec.setIndicator("내가 쓴 글");
 		// spec.setIndicator("", getResources().getDrawable(R.drawable.));
 		tabHost.addTab(spec);
-		
-		TabWidget tabWidget = tabHost.getTabWidget();
-		for(int i=0; i<3; i++){
-			TextView tv = (TextView) tabWidget.getChildAt(i).findViewById(android.R.id.title);
+
+		tabWidget = tabHost.getTabWidget();
+		for (int i = 0; i < 3; i++) {
+			View tc = tabWidget.getChildAt(i);
+			tc.setBackgroundColor(Color.parseColor(preferences.getString(
+					"pref_ui_color", "#7beda7")));
+			TextView tv = (TextView) tc.findViewById(android.R.id.title);
 			tv.setTextColor(Color.parseColor("#FFFFFF"));
 			tv.setTextSize(16);
 		}
-		
+
 		tabHost.setCurrentTab(1);
-		tabHost.setOnTabChangedListener(new OnTabChangeListener() { // 탭 클릭되었을때 호출되는 메소드
+		tabHost.setOnTabChangedListener(new OnTabChangeListener() { // 탭 클릭되었을때
+																	// 호출되는 메소드
 			@Override
 			public void onTabChanged(String tabId) {
 			}
@@ -158,27 +167,50 @@ public class TabActivity extends Activity {
 	}
 
 	private void get_newsfeed() {
-		array1.add(new PostItem(1, "조은현", "2015/04/25", "http://sw.skku.ac.kr/image/student/wats/popup/project_sum.jpg", "ㅎㅎㅎ1", null, 100.0, 100.0));
-		array1.add(new PostItem(1, "조은현", "2015/04/25", "", "ㅎㅎㅎ2", null, 100.0, 100.0));
-		
-		int txtSize = Integer.parseInt(preferences.getString("pref_content_text_size", "16"));
+		array1.add(new PostItem(
+				1,
+				"조은현",
+				"2015/04/25",
+				"http://sw.skku.ac.kr/image/student/wats/popup/project_sum.jpg",
+				"ㅎㅎㅎ1", null, 100.0, 100.0));
+		array1.add(new PostItem(1, "조은현", "2015/04/25", "", "ㅎㅎㅎ2", null,
+				100.0, 100.0));
+
+		int txtSize = Integer.parseInt(preferences.getString(
+				"pref_content_text_size", "16"));
 		adapter1 = new PostAdapter(this, R.layout.post, array1);
-        adapter1.settxtSize(txtSize);
+		adapter1.settxtSize(txtSize);
 		ListOne.setAdapter(adapter1);
 	}
-	
+
 	private void get_my_posts() {
 		ArrayList<CommentItem> commentarray1 = new ArrayList<CommentItem>();
 		ArrayList<CommentItem> commentarray2 = new ArrayList<CommentItem>();
-		commentarray1.add(new CommentItem("익명", "2015/04/26", "도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배"));
+		commentarray1
+				.add(new CommentItem(
+						"익명",
+						"2015/04/26",
+						"도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배"));
 		commentarray2.add(new CommentItem("김승현", "2015/04/26", "ㅡㅡ?"));
 		commentarray2.add(new CommentItem("박현하", "2015/04/26", "ㅇㅅㅇ;;"));
-		array2.add(new PostItem(1, "조은현", "2015/04/25", "", "도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배", commentarray1, 100.0, 100.0));
-		array2.add(new PostItem(1, "조은현", "2015/04/25", "http://sw.skku.ac.kr/image/student/wats/popup/project_sum.jpg", "ㅎㅎㅎ2", commentarray2, 100.0, 100.0));
-		
-		int txtSize = Integer.parseInt(preferences.getString("pref_content_text_size", "16"));
+		array2.add(new PostItem(
+				1,
+				"조은현",
+				"2015/04/25",
+				"",
+				"도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배도배",
+				commentarray1, 100.0, 100.0));
+		array2.add(new PostItem(
+				1,
+				"조은현",
+				"2015/04/25",
+				"http://sw.skku.ac.kr/image/student/wats/popup/project_sum.jpg",
+				"ㅎㅎㅎ2", commentarray2, 100.0, 100.0));
+
+		int txtSize = Integer.parseInt(preferences.getString(
+				"pref_content_text_size", "16"));
 		adapter2 = new PostAdapter(this, R.layout.post, array2);
-        adapter2.settxtSize(txtSize);
+		adapter2.settxtSize(txtSize);
 		ListTwo.setAdapter(adapter2);
 	}
 
@@ -196,36 +228,47 @@ public class TabActivity extends Activity {
 		// as you specify a parent activity in AndroidManifest.xml.
 		int id = item.getItemId();
 		if (id == R.id.action_settings) {
-			startActivityForResult(new Intent(this, SettingsActivity.class), SETTINGS_INFO);
+			startActivityForResult(new Intent(this, SettingsActivity.class),
+					SETTINGS_INFO);
 			return true;
-		}
-		else if(id == R.id.action_refresh){
+		} else if (id == R.id.action_refresh) {
 			// 새로고침
+		} else if (id == R.id.action_logout) {
+			SharedPreferences preferences = PreferenceManager
+					.getDefaultSharedPreferences(this);
+			SharedPreferences.Editor editor = preferences.edit();
+			editor.putString("id", "EMPTY_");
+			editor.commit();
+			startActivity(new Intent(this, MainActivity.class));
+			finish();
 		}
 		return super.onOptionsItemSelected(item);
 	}
-	
-	public void onImage(View v){
+
+	public void onImage(View v) {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		View customLayout = View.inflate(this, R.layout.uploadimage, null);
 		builder.setView(customLayout);
 		dialog = builder.create();
 		dialog.show();
 	}
-	
-	public void onClickImg(View v){
+
+	public void onClickImg(View v) {
 		dialog.dismiss();
-		switch(v.getId()){
+		switch (v.getId()) {
 		case R.id.selectcamera:
-      		Intent intCamera = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-      		File file = new File(Environment.getExternalStorageDirectory(), SAMPLEIMG);
-      		intCamera.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(file));
-      		startActivityForResult(intCamera, ACT_CAMERA);
-      		break;
+			Intent intCamera = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+			File file = new File(Environment.getExternalStorageDirectory(),
+					SAMPLEIMG);
+			intCamera.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(file));
+			startActivityForResult(intCamera, ACT_CAMERA);
+			break;
 		case R.id.selectalbum:
-    		Intent intAlbum = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-      		startActivityForResult(intAlbum, ACT_GALLERY);
-    		break;
+			Intent intAlbum = new Intent(
+					Intent.ACTION_PICK,
+					android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+			startActivityForResult(intAlbum, ACT_GALLERY);
+			break;
 		}
 	}
 
@@ -233,169 +276,196 @@ public class TabActivity extends Activity {
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		// TODO Auto-generated method stub
 		super.onActivityResult(requestCode, resultCode, data);
-		
-		if(requestCode == SETTINGS_INFO){
-        	SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        	int txtSize = Integer.parseInt(sharedPreferences.getString("pref_content_text_size", "16"));
-        	adapter1.settxtSize(txtSize);
-        	adapter2.settxtSize(txtSize);
-        	adapter1.notifyDataSetChanged();
-        	adapter2.notifyDataSetChanged();
-    		if(sharedPreferences.getBoolean("pref_auto_login", true) && intent.getIntExtra("Activity", 0) == MainActivity.ActivityCode){
-    			SharedPreferences.Editor editor = sharedPreferences.edit();
+
+		if (requestCode == SETTINGS_INFO) {
+			SharedPreferences sharedPreferences = PreferenceManager
+					.getDefaultSharedPreferences(this);
+			int txtSize = Integer.parseInt(sharedPreferences.getString(
+					"pref_content_text_size", "16"));
+			adapter1.settxtSize(txtSize);
+			adapter2.settxtSize(txtSize);
+			adapter1.notifyDataSetChanged();
+			adapter2.notifyDataSetChanged();
+			if (sharedPreferences.getBoolean("pref_auto_login", true)
+					&& intent.getIntExtra("Activity", 0) == MainActivity.ActivityCode) {
+				SharedPreferences.Editor editor = sharedPreferences.edit();
 				editor.putString("id", id);
 				editor.commit();
-    		}
+			}
+
+			actionBar.setBackgroundDrawable(new ColorDrawable(Color
+					.parseColor(sharedPreferences.getString("pref_ui_color",
+							"#7beda7"))));
+			for (int i = 0; i < 3; i++) {
+				View tc = tabWidget.getChildAt(i);
+				tc.setBackgroundColor(Color.parseColor(sharedPreferences
+						.getString("pref_ui_color", "#7beda7")));
+			}
 		}
-		
-	    if(resultCode != RESULT_OK){
-  			return;
-	    }
 
-  		BitmapFactory.Options option = new BitmapFactory.Options();
-  		option.inSampleSize = 4;
-  		
-	    switch(requestCode){
-	    	case ACT_CAMERA:
-	    		File file = new File(Environment.getExternalStorageDirectory(), SAMPLEIMG);
-	      		bmp = BitmapFactory.decodeFile(file.getAbsolutePath(), option);
-	      		file.delete();
-				break;
-	        case ACT_GALLERY: 
-	        	Cursor c = this.getContentResolver().query(data.getData(), null, null, null, null);
-	            c.moveToNext();
-	            String path = c.getString(c.getColumnIndex(MediaStore.MediaColumns.DATA));
-	            Uri uri = Uri.fromFile(new File(path));
-	            c.close();
-	            bmp = BitmapFactory.decodeFile(uri.getPath(), option);
-	        	break;
-	    }
-	    
-	    if(bmp != null){
-	    	image.setImageBitmap(bmp);
-	    }
-	    else{
-	    	Toast.makeText(this, "이미지를 불러오는 데에 실패했습니다.", Toast.LENGTH_SHORT).show();
-	    }
+		if (resultCode != RESULT_OK) {
+			return;
+		}
+
+		BitmapFactory.Options option = new BitmapFactory.Options();
+		option.inSampleSize = 4;
+
+		switch (requestCode) {
+		case ACT_CAMERA:
+			File file = new File(Environment.getExternalStorageDirectory(),
+					SAMPLEIMG);
+			bmp = BitmapFactory.decodeFile(file.getAbsolutePath(), option);
+			file.delete();
+			break;
+		case ACT_GALLERY:
+			Cursor c = this.getContentResolver().query(data.getData(), null,
+					null, null, null);
+			c.moveToNext();
+			String path = c.getString(c
+					.getColumnIndex(MediaStore.MediaColumns.DATA));
+			Uri uri = Uri.fromFile(new File(path));
+			c.close();
+			bmp = BitmapFactory.decodeFile(uri.getPath(), option);
+			break;
+		}
+
+		if (bmp != null) {
+			image.setImageBitmap(bmp);
+		} else {
+			Toast.makeText(this, "이미지를 불러오는 데에 실패했습니다.", Toast.LENGTH_SHORT)
+					.show();
+		}
 	}
-	
-	public void onFinish(View v){
-	      Boolean res_anonymity = anonymity.isChecked(); // 익명 여부
-	      
-	      final String res_user; // 이름
-	      final String res_content = content.getText().toString(); // 글
-	      final String res_image = ""; // 이미지
-	      
-	      LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-	      GPSLocationListener gpsLocationListener = new GPSLocationListener(locationManager);
-	      final double res_latitude = gpsLocationListener.getLatitude(); // 위도
-	      final double res_longitude = gpsLocationListener.getLongitude(); // 경도
-	      gpsLocationListener.stopGettingLocation();
-	      
-	      if(res_anonymity) { // 익명 여부 판단
-	         res_user = "익명";
-	      } else {
-	         res_user = id;
-	      }
-	      
-	      // 서버에 글을 등록
-	      new Thread() {
-	            
-	            @SuppressWarnings("deprecation")
-	            public void run() {
-	               upload_state = DEFAULT;
 
-	            String uriString = "http://telepathy.hyunha.org/post"; // 업로드할 url
-	            ArrayList<BasicNameValuePair> Parameter = new ArrayList<BasicNameValuePair>();
+	public void onFinish(View v) {
+		Boolean res_anonymity = anonymity.isChecked(); // 익명 여부
 
-	            try {
-	               URI uri = new URI(uriString);
-	               HttpClient httpclient = new DefaultHttpClient();
-	               HttpPost httpPost = new HttpPost(uri);
+		final String res_user; // 이름
+		final String res_content = content.getText().toString(); // 글
+		final String res_image = ""; // 이미지
 
-	               Parameter.add(new BasicNameValuePair("p_user", res_user));
-	               Parameter.add(new BasicNameValuePair("p_image", res_image));
-	               Parameter.add(new BasicNameValuePair("p_content", res_content));
-	               Parameter.add(new BasicNameValuePair("p_lati", Double.toString(res_latitude)));
-	               Parameter.add(new BasicNameValuePair("p_long", Double.toString(res_longitude)));
-	               
-	               Log.d("Upload", "Uploading data");
-	               Log.d("Upload", "- "+res_user);
-	               Log.d("Upload", "- "+res_image);
-	               Log.d("Upload", "- "+res_content);
-	               Log.d("Upload", "- "+Double.toString(res_latitude));
-	               Log.d("Upload", "- "+Double.toString(res_longitude));
-	               
-	               httpPost.setEntity(new UrlEncodedFormEntity(Parameter,"UTF-8"));
+		LocationManager locationManager = (LocationManager) this
+				.getSystemService(Context.LOCATION_SERVICE);
+		GPSLocationListener gpsLocationListener = new GPSLocationListener(
+				locationManager);
+		final double res_latitude = gpsLocationListener.getLatitude(); // 위도
+		final double res_longitude = gpsLocationListener.getLongitude(); // 경도
+		gpsLocationListener.stopGettingLocation();
 
-	               // JSON data 얻어내기
-	               HttpResponse httpResponse = httpclient.execute(httpPost);
-	               String responseString = EntityUtils.toString(
-	                     httpResponse.getEntity(), HTTP.UTF_8);
-	               Log.d("Upload", "responseString");
-	               Log.d("Upload", responseString);
+		if (res_anonymity) { // 익명 여부 판단
+			res_user = "익명";
+		} else {
+			res_user = id;
+		}
 
-	               // JSON data에서 success 여부 알아내기
-	               JSONObject jsonObject = new JSONObject(responseString);
-	               String success = jsonObject.getString("success");
-	               Log.d("Upload", "success : " + success);
+		// 서버에 글을 등록
+		new Thread() {
 
-	               if (res_latitude != GPSLocationListener.DATA_GET_FAILED) upload_state = SUCCESS;
-	               else upload_state = LOCATION_NOT_FOUND;
+			@SuppressWarnings("deprecation")
+			public void run() {
+				upload_state = DEFAULT;
 
-	            } catch (IOException e) {
-	               upload_state = NETWORK_ERROR;
-	            } catch (JSONException e) {
-	               upload_state = NETWORK_ERROR;
-	            } catch (Exception e) {
-	               e.printStackTrace();
-	            }
+				String uriString = "http://telepathy.hyunha.org/post"; // 업로드할
+																		// url
+				ArrayList<BasicNameValuePair> Parameter = new ArrayList<BasicNameValuePair>();
 
-	            if (upload_state == SUCCESS) { // 업로드 성공
-	               Log.d("Upload", "comment : SUCCESS");
-	               runOnUiThread(new Runnable() {
-	                  public void run() {
-	                     Toast.makeText(getApplicationContext(),
-	                           "성공적으로 업로드하였습니다.", Toast.LENGTH_SHORT)
-	                           .show();
-	                  }
-	               });
-	               startActivity(new Intent(getApplicationContext(), TabActivity.class));
-	               finish();
-	               
-	            } else if (upload_state == LOCATION_NOT_FOUND) { // 업로드 성공 - 좌표 찾기 실패
-	               Log.d("Upload", "comment : LOCATION_NOT_FOUND");
-	               runOnUiThread(new Runnable() {
-	                  public void run() {
-	                     Toast.makeText(getApplicationContext(),
-	                           "좌표 찾기에 실패하였습니다. 좌표에 대한 정보 없이 업로드합니다.", Toast.LENGTH_SHORT)
-	                           .show();
-	                  }
-	               });
-	               startActivity(new Intent(getApplicationContext(), TabActivity.class));
-	               finish();
+				try {
+					URI uri = new URI(uriString);
+					HttpClient httpclient = new DefaultHttpClient();
+					HttpPost httpPost = new HttpPost(uri);
 
-	            } else if (upload_state == NETWORK_ERROR) { // 업로드 실패 - 네트워크 오류
-	               Log.d("Upload", "comment : NETWORK_ERROR");
-	               runOnUiThread(new Runnable() {
-	                  public void run() {
-	                     Toast.makeText(getApplicationContext(),
-	                           "네트워크 상태를 확인하십시오.", Toast.LENGTH_SHORT)
-	                           .show();
-	                  }
-	               });
+					Parameter.add(new BasicNameValuePair("p_user", res_user));
+					Parameter.add(new BasicNameValuePair("p_image", res_image));
+					Parameter.add(new BasicNameValuePair("p_content",
+							res_content));
+					Parameter.add(new BasicNameValuePair("p_lati", Double
+							.toString(res_latitude)));
+					Parameter.add(new BasicNameValuePair("p_long", Double
+							.toString(res_longitude)));
 
-	            } else { // 업로드 실패 - 알 수 없는 오류
-	               Log.d("Register", "comment : DEFAULT");
-	               runOnUiThread(new Runnable() {
-	                  public void run() {
-	                     Toast.makeText(getApplicationContext(),
-	                           "알 수 없는 오류가 발생했습니다.", Toast.LENGTH_SHORT)
-	                           .show();
-	                  }
-	               });
-	            }
-	         }
-	      }.start(); // thread end
-	   }
+					Log.d("Upload", "Uploading data");
+					Log.d("Upload", "- " + res_user);
+					Log.d("Upload", "- " + res_image);
+					Log.d("Upload", "- " + res_content);
+					Log.d("Upload", "- " + Double.toString(res_latitude));
+					Log.d("Upload", "- " + Double.toString(res_longitude));
+
+					httpPost.setEntity(new UrlEncodedFormEntity(Parameter,
+							"UTF-8"));
+
+					// JSON data 얻어내기
+					HttpResponse httpResponse = httpclient.execute(httpPost);
+					String responseString = EntityUtils.toString(
+							httpResponse.getEntity(), HTTP.UTF_8);
+					Log.d("Upload", "responseString");
+					Log.d("Upload", responseString);
+
+					// JSON data에서 success 여부 알아내기
+					JSONObject jsonObject = new JSONObject(responseString);
+					String success = jsonObject.getString("success");
+					Log.d("Upload", "success : " + success);
+
+					if (res_latitude != GPSLocationListener.DATA_GET_FAILED)
+						upload_state = SUCCESS;
+					else
+						upload_state = LOCATION_NOT_FOUND;
+
+				} catch (IOException e) {
+					upload_state = NETWORK_ERROR;
+				} catch (JSONException e) {
+					upload_state = NETWORK_ERROR;
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+
+				if (upload_state == SUCCESS) { // 업로드 성공
+					Log.d("Upload", "comment : SUCCESS");
+					runOnUiThread(new Runnable() {
+						public void run() {
+							Toast.makeText(getApplicationContext(),
+									"성공적으로 업로드하였습니다.", Toast.LENGTH_SHORT)
+									.show();
+						}
+					});
+					startActivity(new Intent(getApplicationContext(),
+							TabActivity.class));
+					finish();
+
+				} else if (upload_state == LOCATION_NOT_FOUND) { // 업로드 성공 - 좌표
+																	// 찾기 실패
+					Log.d("Upload", "comment : LOCATION_NOT_FOUND");
+					runOnUiThread(new Runnable() {
+						public void run() {
+							Toast.makeText(getApplicationContext(),
+									"좌표 찾기에 실패하였습니다. 좌표에 대한 정보 없이 업로드합니다.",
+									Toast.LENGTH_SHORT).show();
+						}
+					});
+					startActivity(new Intent(getApplicationContext(),
+							TabActivity.class));
+					finish();
+
+				} else if (upload_state == NETWORK_ERROR) { // 업로드 실패 - 네트워크 오류
+					Log.d("Upload", "comment : NETWORK_ERROR");
+					runOnUiThread(new Runnable() {
+						public void run() {
+							Toast.makeText(getApplicationContext(),
+									"네트워크 상태를 확인하십시오.", Toast.LENGTH_SHORT)
+									.show();
+						}
+					});
+
+				} else { // 업로드 실패 - 알 수 없는 오류
+					Log.d("Register", "comment : DEFAULT");
+					runOnUiThread(new Runnable() {
+						public void run() {
+							Toast.makeText(getApplicationContext(),
+									"알 수 없는 오류가 발생했습니다.", Toast.LENGTH_SHORT)
+									.show();
+						}
+					});
+				}
+			}
+		}.start(); // thread end
+	}
 }
