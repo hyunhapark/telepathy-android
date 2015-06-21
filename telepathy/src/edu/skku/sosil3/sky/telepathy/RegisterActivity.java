@@ -113,9 +113,12 @@ public class RegisterActivity extends Activity {
 	               
 	               if (register_state==SUCCESS) { // 로그인 성공
 	                  Log.d("Register","comment : SUCCESS");
-	                  Toast.makeText(getApplicationContext(), "회원가입이 완료되었습니다.", Toast.LENGTH_SHORT)
-                      .show();
-	                  finish();
+	                  runOnUiThread(new Runnable(){
+	                       public void run(){
+	                    	   Toast.makeText(getApplicationContext(), "회원가입이 완료되었습니다.", Toast.LENGTH_SHORT).show();
+	     	                   finish();
+	                       }
+	                  });
 	                  
 	               } else if (register_state==WRONG_ID) { // 로그인 실패 - ID나 암호가 잘못됨
 	                  Log.d("Register","comment : WRONG_IDPW");
