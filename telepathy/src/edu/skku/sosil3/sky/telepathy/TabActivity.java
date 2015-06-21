@@ -51,6 +51,7 @@ public class TabActivity extends Activity {
 	Dialog dialog;
 	Bitmap bmp = null;
 	ActionBar actionBar;
+	String id;
 	
 	static String SAMPLEIMG = "photo.png";
 	private final static int ACT_CAMERA = 1;
@@ -61,6 +62,8 @@ public class TabActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_tab);
+
+		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
 		
 		ListOne = (ListView) findViewById(R.id.two_list);
 		ListTwo = (ListView) findViewById(R.id.three_list);
@@ -91,7 +94,6 @@ public class TabActivity extends Activity {
 		array2.add(new PostItem(1, "조은현", "2015/04/25", "http://sw.skku.ac.kr/image/student/wats/popup/project_sum.jpg", "ㅎㅎㅎ2", commentarray2, 100.0, 100.0));
 		// 데이터 수집 끝
 
-		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
 		int txtSize = Integer.parseInt(preferences.getString("pref_content_text_size", "16"));
 		System.out.println(txtSize);
 		

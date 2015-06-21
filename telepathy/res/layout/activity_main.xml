@@ -13,6 +13,7 @@
         android:layout_height="120dp"
         android:text="TELEPATHY"
         android:textSize="30sp"
+        android:textColor="#86E57F"
         android:gravity="center" />
     
     <LinearLayout
@@ -72,15 +73,19 @@
     <Button
         android:onClick="onLogin"
         android:text="로그인"
+        android:textColor="#FFFFFF"
         android:layout_width="100dp"
         android:layout_height="40dp"
+        android:background="#86E57F"
         />
         
     <Button
         android:onClick="onRegister"
         android:text="회원가입"
+        android:textColor="#FFFFFF"
         android:layout_width="100dp"
         android:layout_height="40dp"
+        android:background="#86E57F"
         />
     
     </LinearLayout>
