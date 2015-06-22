@@ -1,7 +1,7 @@
 package edu.skku.sosil3.sky.telepathy;
 
 public class Constants {
-	public static final long BUILD_NO = 0;
+	public static final long BUILD_NO = 1; // v.0.0.2
 	
 	public static final String URL_SERVER_HOST = "http://telepathy.hyunha.org";
 	
