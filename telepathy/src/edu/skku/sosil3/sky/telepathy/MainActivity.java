@@ -28,6 +28,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+@SuppressWarnings("deprecation")
 public class MainActivity extends Activity {
 	
 	EditText edit_id;
@@ -86,7 +87,6 @@ public class MainActivity extends Activity {
 			// 로그인 요청
 	         new Thread() {
 	            
-	            @SuppressWarnings("deprecation")
 	            public void run() {
 	               login_state = DEFAULT;
 	               

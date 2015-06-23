@@ -29,9 +29,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 import edu.skku.sosil3.sky.telepathy.MyMultipartEntity.ProgressListener;
 
+@SuppressWarnings("deprecation")
 public class ImageUploadTask extends AsyncTask<Void, Integer, Void> {
 
 	private Context ctx;
@@ -49,6 +52,7 @@ public class ImageUploadTask extends AsyncTask<Void, Integer, Void> {
 	String res_content;
 	double res_latitude;
 	double res_longitude;
+	private File file;
 
 	public ImageUploadTask(Context context, String imgPath, String url,
 			String res_user, String res_content, double res_latitude,
@@ -82,7 +86,7 @@ public class ImageUploadTask extends AsyncTask<Void, Integer, Void> {
 	@Override
 	protected Void doInBackground(Void... params) {
 		try {
-			File file = new File(imgPath);
+			file = new File(imgPath);
 
 			// Create the POST object
 			HttpPost post = new HttpPost(url);
@@ -129,6 +133,10 @@ public class ImageUploadTask extends AsyncTask<Void, Integer, Void> {
 		} catch (IOException e) {
 			// Any IO error (e.g. File not found)
 			e.printStackTrace();
+		}finally{
+			if(file!=null && file.exists()){
+				file.delete();
+			}
 		}
 		String res_image = Constants.URL_SERVER_HOST
 				+ Constants.URI_GET_POSTIMAGE + '/' + imgFileName;
@@ -206,6 +214,12 @@ public class ImageUploadTask extends AsyncTask<Void, Integer, Void> {
 			ctx.startActivity(new Intent(ctx, TabActivity.class));
 			((TabActivity) ctx).finish();
 
+			TabActivity ta = (TabActivity)ctx;
+			((TextView)ta.findViewById(R.id.one_content)).setText("");
+			((ImageView)ta.findViewById(R.id.one_image)).setImageResource(R.drawable.pushtopic);
+			ta.tabHost.setCurrentTab(1);
+			ta.refresh_all();
+
 		} else if (TabActivity.upload_state == TabActivity.LOCATION_NOT_FOUND) { // 업로드
 																					// 성공
 																					// -
@@ -214,8 +228,11 @@ public class ImageUploadTask extends AsyncTask<Void, Integer, Void> {
 			Log.d("Upload", "comment : LOCATION_NOT_FOUND");
 			Toast.makeText(ctx, "좌표 찾기에 실패하였습니다. 좌표에 대한 정보 없이 업로드합니다.",
 					Toast.LENGTH_SHORT).show();
-			ctx.startActivity(new Intent(ctx, TabActivity.class));
-			((TabActivity) ctx).finish();
+			TabActivity ta = (TabActivity)ctx;
+			((TextView)ta.findViewById(R.id.one_content)).setText("");
+			((ImageView)ta.findViewById(R.id.one_image)).setImageResource(R.drawable.pushtopic);
+			ta.tabHost.setCurrentTab(1);
+			ta.refresh_all();
 
 		} else if (TabActivity.upload_state == TabActivity.NETWORK_ERROR) { // 업로드
 																			// 실패

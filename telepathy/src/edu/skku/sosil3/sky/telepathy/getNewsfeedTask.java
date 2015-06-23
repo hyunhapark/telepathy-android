@@ -4,6 +4,7 @@ package edu.skku.sosil3.sky.telepathy;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 
 import org.apache.http.client.ClientProtocolException;
 import org.json.JSONArray;
@@ -11,7 +12,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.content.Context;
-import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.widget.Toast;
 
@@ -24,24 +24,17 @@ public class GetNewsfeedTask extends AsyncTask<Void, Void, Void>
 	TabActivity ta;
 	
 	
-	public GetNewsfeedTask(Context ctx) {
-		super();
-		this.ctx = ctx;
-		this.ta = (TabActivity) ctx; 
-		
-		LocationManager locationManager = (LocationManager) ctx.getSystemService(Context.LOCATION_SERVICE);
-        GPSLocationListener gpsLocationListener = new GPSLocationListener(locationManager);
-        double p_lati = gpsLocationListener.getLatitude(); // 위도
-        double p_long = gpsLocationListener.getLongitude(); // 경도
-	      gpsLocationListener.stopGettingLocation();
-		this.url = Constants.URL_SERVER_HOST+Constants.URI_GET_NEWSFEED+"/anonymous/"+p_lati+"/"+p_long+"/"+Constants.DEFAULT_PAGE_SIZE+"/0";
-	}
 	
-	public GetNewsfeedTask(Context ctx, String url) {
+	public GetNewsfeedTask(Context ctx, String url, int lim, int page, boolean clear) {
 		super();
 		this.ctx = ctx;
 		this.ta = (TabActivity) ctx;
-		this.url = url;
+		if (clear){
+			this.url = url+lim*page+"/0";
+			((TabActivity)ctx).array1.clear();
+		}else{
+			this.url = url+lim+"/"+page;
+		}
 	}
 
 	@Override
@@ -51,9 +44,12 @@ public class GetNewsfeedTask extends AsyncTask<Void, Void, Void>
 			data = jd.get(url);
 		} catch (ClientProtocolException e) {
 			e.printStackTrace();
+			((TabActivity)ctx).nf_page--;
 		} catch (IOException e) {
+			((TabActivity)ctx).nf_page--;
 		} catch (JSONException e) {
 			e.printStackTrace();
+			((TabActivity)ctx).nf_page--;
 		}
 		
 		return null;
@@ -74,9 +70,11 @@ public class GetNewsfeedTask extends AsyncTask<Void, Void, Void>
 		} catch (JSONException e) {
 			Toast.makeText(ctx, "Error. check network status and try again later.", Toast.LENGTH_LONG).show();
 			e.printStackTrace();
+			((TabActivity)ctx).nf_page--;
 			return;
 		}catch (NullPointerException npe) {
 			Toast.makeText(ctx, "Error. check network status and try again later.", Toast.LENGTH_LONG).show();
+			((TabActivity)ctx).nf_page--;
 			return;
 		} 
 		for (int i=0; i<cnt; i++){
@@ -95,8 +93,11 @@ public class GetNewsfeedTask extends AsyncTask<Void, Void, Void>
 				JSONArray cmts = jcmts.getJSONArray("arr");
 				for (int j=0;j<ccnt;j++){
 					JSONObject jcmt = cmts.getJSONObject(j);
+					Date d = new Date(Long.parseLong(jcmt.getString("c_date")));
+					
 					CommentItem ci = new CommentItem(jcmt.getString("c_user"),
-							jcmt.getString("c_date"), jcmt.getString("c_content")); 
+							d.getMonth()+"/"+d.getDate()+" "+d.getHours()+":"+d.getMinutes(), 
+							jcmt.getString("c_content")); 
 					cmt.add(ci);
 				}
 			} catch (JSONException e1) {
@@ -115,6 +116,12 @@ public class GetNewsfeedTask extends AsyncTask<Void, Void, Void>
 				e.printStackTrace();
 			}
 		}
+		TabActivity ta = (TabActivity)ctx;
+		if(cnt==0){
+			ta.noMoreContentsOne = true;
+		}
+		ta.switcherOne.showPrevious();
+		ta.mLockListViewOne = false;
 		ta.adapter1.notifyDataSetChanged();
 	}
 

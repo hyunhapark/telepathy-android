@@ -6,7 +6,6 @@ import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.UUID;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -19,6 +18,7 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -40,7 +40,10 @@ import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
+import android.widget.AbsListView;
+import android.widget.AbsListView.OnScrollListener;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -50,13 +53,16 @@ import android.widget.TabHost.OnTabChangeListener;
 import android.widget.TabWidget;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ViewSwitcher;
 
+@SuppressLint("SimpleDateFormat")
+@SuppressWarnings("deprecation")
 public class TabActivity extends Activity {
 
 	TabHost tabHost;
 	TabWidget tabWidget;
-	public ListView ListOne = null;
-	public ListView ListTwo = null;
+	public ListView listOne = null;
+	public ListView listTwo = null;
 	public PostAdapter adapter1 = null;
 	public PostAdapter adapter2 = null;
 	CheckBox anonymity;
@@ -74,9 +80,15 @@ public class TabActivity extends Activity {
 	public ArrayList<PostItem> array1;
 	public ArrayList<PostItem> array2;
 	public double p_lati, p_long;
-	private int nf_page = 0;
-	private int mp_page = 0;
+	public int nf_page = 0;
+	public int mp_page = 0;
 	private String image_path;
+	public boolean mLockListViewOne = false;
+	public boolean noMoreContentsOne = false;
+	public boolean mLockListViewTwo = false;
+	public boolean noMoreContentsTwo = false;
+	public ViewSwitcher switcherOne;
+	public ViewSwitcher switcherTwo;
 	
 	static String SAMPLEIMG = "photo.png";
 	private final static int ACT_CAMERA = 1;
@@ -105,8 +117,8 @@ public class TabActivity extends Activity {
 			editor.commit();
 		}
 		
-		ListOne = (ListView) findViewById(R.id.two_list);
-		ListTwo = (ListView) findViewById(R.id.three_list);
+		listOne = (ListView) findViewById(R.id.two_list);
+		listTwo = (ListView) findViewById(R.id.three_list);
 		anonymity = (CheckBox) findViewById(R.id.one_anonymity);
 		date = (TextView) findViewById(R.id.one_date);
 		image = (ImageView) findViewById(R.id.one_image);
@@ -126,8 +138,8 @@ public class TabActivity extends Activity {
 		int txtSize = Integer.parseInt(preferences.getString("pref_content_text_size", "16"));
         adapter1.settxtSize(txtSize);
         adapter2.settxtSize(txtSize);
-        ListOne.setAdapter(adapter1);
-        ListTwo.setAdapter(adapter2);
+        listOne.setAdapter(adapter1);
+        listTwo.setAdapter(adapter2);
 
 		LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
         GPSLocationListener gpsLocationListener = new GPSLocationListener(locationManager);
@@ -137,10 +149,61 @@ public class TabActivity extends Activity {
         
         nf_page = 0;
         mp_page = 0;
-        
+
+
+		//add the ViewSwitcher to the footer
+		switcherOne = new ViewSwitcher(this);
+		switcherOne.addView(View.inflate(this, R.layout.btn_loadmore, null));
+		switcherOne.addView(View.inflate(this, R.layout.loading_footer, null));
+		listOne.addFooterView(switcherOne);
+		
+		switcherTwo = new ViewSwitcher(this);
+		switcherTwo.addView(View.inflate(this, R.layout.btn_loadmore, null));
+		switcherTwo.addView(View.inflate(this, R.layout.loading_footer, null));
+		listTwo.addFooterView(switcherTwo);
+		
+		listOne.setOnScrollListener(new OnScrollListener() {
+			
+			@Override
+			public void onScrollStateChanged(AbsListView view, int scrollState) {
+				
+			}
+			
+			@Override
+			public void onScroll(AbsListView view, int firstVisibleItem,
+					int visibleItemCount, int totalItemCount) {
+				int count = totalItemCount - visibleItemCount;
+
+			    if(firstVisibleItem >= count && totalItemCount != 0
+			      && mLockListViewOne == false && noMoreContentsOne == false){
+			    	mLockListViewOne = true;
+			        get_newsfeed(false);
+			    }
+			}
+		});
+		listTwo.setOnScrollListener(new OnScrollListener() {
+			
+			@Override
+			public void onScrollStateChanged(AbsListView view, int scrollState) {
+				
+			}
+			
+			@Override
+			public void onScroll(AbsListView view, int firstVisibleItem,
+					int visibleItemCount, int totalItemCount) {
+				int count = totalItemCount - visibleItemCount;
+
+			    if(firstVisibleItem >= count && totalItemCount != 0
+			      && mLockListViewTwo == false && noMoreContentsTwo == false){
+			    	mLockListViewTwo = true;
+			        get_my_posts(false);
+			    }
+			}
+		});
+		
 		// 서버 연결, 데이터 수집
-		get_newsfeed();
-		get_my_posts();
+		//get_newsfeed();
+		get_my_posts(false);
 		// 데이터 수집 끝
 		
 		tabHost = (TabHost) findViewById(R.id.tabhost);
@@ -177,27 +240,66 @@ public class TabActivity extends Activity {
 		tabHost.setOnTabChangedListener(new OnTabChangeListener() { // 탭 클릭되었을때 호출되는 메소드
 			@Override
 			public void onTabChanged(String tabId) {
+				if(!"".equals(preferences.getString("id", ""))){
+					id = preferences.getString("id", "");
+				}
+			}
+		});
+		tabHost.setOnTouchListener(new View.OnTouchListener() {
+			
+			@Override
+			public boolean onTouch(View v, MotionEvent event) {
+				if (event.getAction()==MotionEvent.ACTION_DOWN){
+					refresh_all();
+				}
+				return false;
 			}
 		});
 	}
 
-	private void get_newsfeed() {
-		String url = Constants.URL_SERVER_HOST+Constants.URI_GET_NEWSFEED+"/"+id+"/"+p_lati+"/"+p_long+"/"+Constants.DEFAULT_PAGE_SIZE+"/"+nf_page++;
-		new GetNewsfeedTask(this, url).execute();
+	public void onClickMore(View arg0) {
+        if (tabHost.getCurrentTab()==1){
+			if(mLockListViewOne == false && 
+					noMoreContentsOne == false){
+				mLockListViewOne = true;
+		        get_newsfeed(false);
+			}
+			if(noMoreContentsOne){
+				Toast.makeText(getApplicationContext(), "더 이상 가져올 글이 없습니다.", Toast.LENGTH_LONG).show();
+			}
+        }else if (tabHost.getCurrentTab()==2){
+			if(mLockListViewTwo == false && 
+					noMoreContentsTwo == false){
+				mLockListViewTwo = true;
+	        	get_my_posts(false);
+			}
+			if(noMoreContentsTwo){
+				Toast.makeText(getApplicationContext(), "더 이상 가져올 글이 없습니다.", Toast.LENGTH_LONG).show();
+			}
+        }
+    }
+
+	private synchronized void get_newsfeed(boolean clear) {
+    	switcherOne.showNext();
+		String url = Constants.URL_SERVER_HOST+Constants.URI_GET_NEWSFEED+"/"+id+"/"+p_lati+"/"+p_long+"/";
+		new GetNewsfeedTask(this, url, Constants.DEFAULT_PAGE_SIZE, nf_page, clear).execute();
+		if(!clear){
+			nf_page++;
+		}
 	}
 	
-	private void get_my_posts() {
-		String url = Constants.URL_SERVER_HOST+Constants.URI_GET_MYPOSTS+"/"+id+"/"+p_lati+"/"+p_long+"/"+Constants.DEFAULT_PAGE_SIZE+"/"+mp_page++;
-		new GetMypostsTask(this, url).execute();
+	private synchronized void get_my_posts(boolean clear) {
+    	switcherTwo.showNext();
+		String url = Constants.URL_SERVER_HOST+Constants.URI_GET_MYPOSTS+"/"+id+"/"+p_lati+"/"+p_long+"/";
+		new GetMypostsTask(this, url, Constants.DEFAULT_PAGE_SIZE, mp_page, clear).execute();
+		if (!clear){
+			mp_page++;
+		}
 	}
 	
 	public void refresh_all() {
-		array1.clear();
-		array2.clear();
-		String url = Constants.URL_SERVER_HOST+Constants.URI_GET_NEWSFEED+"/"+id+"/"+p_lati+"/"+p_long+"/"+Constants.DEFAULT_PAGE_SIZE*nf_page+"/0";
-		new GetNewsfeedTask(this, url).execute();
-		url = Constants.URL_SERVER_HOST+Constants.URI_GET_MYPOSTS+"/"+id+"/"+p_lati+"/"+p_long+"/"+Constants.DEFAULT_PAGE_SIZE*mp_page+"/0";
-		new GetMypostsTask(this, url).execute();
+		get_newsfeed(true);
+		get_my_posts(true);
 	}
 
 	@Override
@@ -303,7 +405,6 @@ public class TabActivity extends Activity {
 	    		File file = new File(Environment.getExternalStorageDirectory(), SAMPLEIMG);
 	    		image_path = file.getAbsolutePath();
 	      		bmp = BitmapFactory.decodeFile(file.getAbsolutePath(), option);
-	      		//file.delete(); TODO
 				break;
 	        case ACT_GALLERY: 
 	        	Cursor c = this.getContentResolver().query(data.getData(), null, null, null, null);
@@ -341,6 +442,7 @@ public class TabActivity extends Activity {
 
 		if (res_anonymity) { // 익명 여부 판단
 			res_user = "익명";
+			Toast.makeText(this, "익명글은 내가 쓴 글에 표시되지 않습니다.", Toast.LENGTH_SHORT).show();
 		} else {
 			res_user = id;
 		}
@@ -353,7 +455,6 @@ public class TabActivity extends Activity {
 			// 서버에 글을 등록
 			new Thread() {
 	
-				@SuppressWarnings("deprecation")
 				public void run() {
 					upload_state = DEFAULT;
 	
@@ -389,13 +490,13 @@ public class TabActivity extends Activity {
 						HttpResponse httpResponse = httpclient.execute(httpPost);
 						String responseString = EntityUtils.toString(
 								httpResponse.getEntity(), HTTP.UTF_8);
-						Log.d("Upload", "responseString");
-						Log.d("Upload", responseString);
+						//Log.d("Upload", "responseString");
+						//Log.d("Upload", responseString);
 	
 						// JSON data에서 success 여부 알아내기
 						JSONObject jsonObject = new JSONObject(responseString);
 						String success = jsonObject.getString("success");
-						Log.d("Upload", "success : " + success);
+						//Log.d("Upload", "success : " + success);
 	
 						if (res_latitude != GPSLocationListener.DATA_GET_FAILED)
 							upload_state = SUCCESS;
@@ -417,11 +518,12 @@ public class TabActivity extends Activity {
 								Toast.makeText(getApplicationContext(),
 										"성공적으로 업로드하였습니다.", Toast.LENGTH_SHORT)
 										.show();
+								((TextView)findViewById(R.id.one_content)).setText("");
+								((ImageView)findViewById(R.id.one_image)).setImageResource(R.drawable.pushtopic);
+								tabHost.setCurrentTab(1);
+								refresh_all();
 							}
 						});
-						startActivity(new Intent(getApplicationContext(),
-								TabActivity.class));
-						finish();
 	
 					} else if (upload_state == LOCATION_NOT_FOUND) { // 업로드 성공 - 좌표
 																		// 찾기 실패
@@ -431,12 +533,13 @@ public class TabActivity extends Activity {
 								Toast.makeText(getApplicationContext(),
 										"좌표 찾기에 실패하였습니다. 좌표에 대한 정보 없이 업로드합니다.",
 										Toast.LENGTH_SHORT).show();
+								((TextView)findViewById(R.id.one_content)).setText("");
+								((ImageView)findViewById(R.id.one_image)).setImageResource(R.drawable.pushtopic);
+								tabHost.setCurrentTab(1);
+								refresh_all();
 							}
 						});
-						startActivity(new Intent(getApplicationContext(),
-								TabActivity.class));
-						finish();
-	
+
 					} else if (upload_state == NETWORK_ERROR) { // 업로드 실패 - 네트워크 오류
 						Log.d("Upload", "comment : NETWORK_ERROR");
 						runOnUiThread(new Runnable() {

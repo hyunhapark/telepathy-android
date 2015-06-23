@@ -15,8 +15,6 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.util.Log;
-
 @SuppressWarnings("deprecation")
 public class JSONDownloader {
 	private HttpClient httpClient;
